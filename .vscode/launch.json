@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-TriFormApplication<TriForm>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "TriForm.TriFormApplication",
+            "projectName": "TriForm",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
