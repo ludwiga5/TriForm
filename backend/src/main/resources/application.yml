@@ -4,4 +4,11 @@ server:
 spring:
   application:
     name: triform
-
+  datasource:
+    url: jdbc:sqlite:./data/triform.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: config.SQLiteDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true      

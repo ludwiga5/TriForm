@@ -20,4 +20,18 @@ public class User {
 
     @Column(name = "Email", nullable = false, unique = true)
     private String email;
+
+
+
+    //Get Methods
+    public Long getId(){    
+        return id;
+    }
+    public String getUsername(){
+        return username;
+    }
+    public String getEmail(){
+        return email;
+    }
+    //getPassword
 }
