@@ -26,12 +26,30 @@ public class User {
     //Get Methods
     public Long getId(){    
         return id;
-    }
-    public String getUsername(){
+
+    } public String getUsername(){
         return username;
-    }
-    public String getEmail(){
+
+    } public String getEmail(){
         return email;
+
+    } public String getPassword(){
+        return password;
+
     }
-    //getPassword
+
+    //Set Methods
+    public void setID(Long newID){
+        id = newID;
+
+    } public void setUsername(String newUsername){
+        username = newUsername;
+
+    } public void setEmail(String newEmail){
+        email = newEmail;
+
+    } public void setPassword(String newPassword){
+        password = newPassword;
+        
+    }
 }
