@@ -8,7 +8,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
 @Configuration
@@ -33,9 +32,7 @@ public class SecurityConfig {
                 -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .securityContext(context 
-                -> context.securityContextRepository(new NullSecurityContextRepository())
-            )
+
             .requestCache(cache 
                 -> cache.requestCache(new NullRequestCache())
             )
@@ -54,6 +51,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize 
                 -> authorize
                 .requestMatchers("/api/public/**", "/api/login", "/api/register").permitAll()
+                .requestMatchers("/api/profile").authenticated()
                 .anyRequest().authenticated()
             );
 

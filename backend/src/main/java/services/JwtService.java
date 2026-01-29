@@ -36,8 +36,8 @@ public class JwtService {
         .setSubject(username)
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis()+3600000))
-        .signWith(key)
         .claim("userId", id)
+        .signWith(key)
         .compact();
 
         return token;
@@ -60,36 +60,33 @@ public class JwtService {
         return username;
 
     //Extracts userID from token
-    } public String extractId(String token){
+    } public Long extractId(String token){
 
         //Conver Secret to Key
         SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecret()));
 
         //Parse for ID
-        String id = Jwts.parserBuilder()
+        Long id = Jwts.parserBuilder()
         .setSigningKey(key)
         .build()
         .parseClaimsJws(token)
         .getBody()
-        .getId();
+        .get("userId", Long.class);
 
         return id;
 
     //Validates token
     } public void validateToken(String token){
-
         //Convert Secret to Key
-        SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecret()));
-
+        SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecret()));        
         //Checks token expiration
         try{
+            
         //Parse for Expiration
         Jwts.parserBuilder()
         .setSigningKey(key)
         .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .getExpiration();
+        .parseClaimsJws(token);
         }
 
         //Catch Invalid, Malformed, & Unsupported tokens later

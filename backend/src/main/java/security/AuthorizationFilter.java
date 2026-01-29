@@ -72,6 +72,14 @@ public class AuthorizationFilter extends OncePerRequestFilter{
             return;
         }
 
+        //Set user in security context
+        org.springframework.security.core.context.SecurityContextHolder
+            .getContext()
+            .setAuthentication(
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                    username, null, new java.util.ArrayList<>()
+                )
+            );
         
         //Passes
         filterChain.doFilter(request, response);
