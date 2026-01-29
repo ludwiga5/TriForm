@@ -4,7 +4,7 @@
             "type": "java",
             "name": "Spring Boot-TriFormApplication<TriForm>",
             "request": "launch",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/backend",
             "mainClass": "TriForm.TriFormApplication",
             "projectName": "TriForm",
             "args": "",
