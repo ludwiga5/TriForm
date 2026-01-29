@@ -9,8 +9,8 @@ import java.sql.SQLException;
 public class DatabaseManager {
 
     
-    public static String dbPath = "jdbc:sqlite:/main/data/tiform.db";
-    public static String templaceDbPath = "jdbc:sqlite:/main/resources/db/migration/triform.db";
+    public static String dbPath = "jdbc:sqlite:./data/triform.db";
+    public static String templaceDbPath = "jdbc:sqlite:./src/main/resources/db/migration/triform.db";
 
     public void connect(){
 

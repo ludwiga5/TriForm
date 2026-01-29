@@ -12,13 +12,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Usernames",nullable = false, unique = true)
+    @Column(name = "username",nullable = false, unique = true)
     private String username;
 
-    @Column(name = "Passwords", nullable = false, unique = true)
+    @Column(name = "password", nullable = false, unique = true)
     private String password;
 
-    @Column(name = "Email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
 
@@ -39,8 +39,8 @@ public class User {
     }
 
     //Set Methods
-    public void setID(Long newID){
-        id = newID;
+    public void setId(Long newId){
+        id = newId;
 
     } public void setUsername(String newUsername){
         username = newUsername;
