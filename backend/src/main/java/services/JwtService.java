@@ -17,6 +17,7 @@ public class JwtService {
     private final UserRepository userRepository;
     private final JwtProperties jwtProperties;
 
+    //Injects
     public JwtService(UserRepository userRepository, JwtProperties jwtProperties){
         this.userRepository = userRepository;
         this.jwtProperties = jwtProperties;

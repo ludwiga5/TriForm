@@ -102,6 +102,7 @@
 
 	</dependencies>
 
+<!-- Maven Build Plugin -->
 	<build>
 		<plugins>
 			<plugin>

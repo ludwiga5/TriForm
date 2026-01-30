@@ -13,7 +13,7 @@ import exceptions.UserNotFoundException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-//Handles User Authentication, Password Hashing
+//Handles User registration & login
 @Service
 public class UserService {
 
@@ -21,13 +21,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    //Injecting
+    //Injects
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
     //Registers a New User
+    //Generates username, email, password and checks against the UserRepository
+    //Then hashes the users password
+    //Saves the new user in UserRepository
+    //Then returns the user information
     public User registerUser(User user){
 
         String username = user.getUsername();
@@ -47,11 +51,17 @@ public class UserService {
 
         //Acct Persistence
         userRepository.save(user);
+
+        //Once the User is saved, remove the local password value
+        user.setPassword(null);
         
         System.out.println("Register Successful");
         return user;
     
     } 
+    //Logs in User
+    //Checks for user against UserRepository
+    //If the user exists and information matches return JWT token
     public JwtResponse loginUser(User user){
 
         String username = user.getUsername();

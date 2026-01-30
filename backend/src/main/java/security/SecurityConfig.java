@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .disable()
             )
             .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            
+            //Selects which enpoints require authentication
             .authorizeHttpRequests(authorize 
                 -> authorize
                 .requestMatchers("/api/public/**", "/api/login", "/api/register").permitAll()

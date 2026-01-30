@@ -29,7 +29,6 @@ public class AuthorizationFilter extends OncePerRequestFilter{
     }
 
 
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
 
@@ -48,7 +47,7 @@ public class AuthorizationFilter extends OncePerRequestFilter{
         String token;
         String username;
 
-        //Checks & Strips Auth: Bearer just token
+        //Checks & Strips Auth: Bearer token
         if(header!=null && header.startsWith("Bearer")){
             token = header.substring(7);
         }

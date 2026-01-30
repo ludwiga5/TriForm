@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
-
+//Triform Application
+//Scans all directories
 @SpringBootApplication(scanBasePackages = {
     "TriForm",
     "config",
@@ -18,6 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
     "security",
     "services"
 })
+//Enables Repositories
 @EnableJpaRepositories(basePackages = {"repositories"})
 @EntityScan(basePackages = {"entities"})
 public class TriFormApplication {
