@@ -47,9 +47,9 @@ public class AuthorizationFilter extends OncePerRequestFilter{
         String token;
         String username;
 
-        //Checks & Strips Auth: Bearer token
+        //Checks & Strips Auth: Expect Bearer <token>
         if(header!=null && header.startsWith("Bearer")){
-            token = header.substring(7);
+            token = header.substring(7).trim();
         }
         else{
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
