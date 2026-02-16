@@ -2,7 +2,7 @@
 
 **TriForm** is a comprehensive triathlon training platform designed to help athletes plan, track, and optimize their training regimens. Built with AI integration, TriForm generates personalized training plans tailored to your fitness level, goals, and schedule.
 
-## ✨ Features
+## Features
 
 - **User Authentication** — JWT-based secure authentication with user registration and login
 - **Full-Stack Setup** — Next.js frontend with Spring Boot backend, fully synchronized with CORS
@@ -12,7 +12,7 @@
 - **Progress Analytics** — Visualize your training progress over time (coming soon)
 - **Responsive Backend API** — RESTful API for seamless integration with frontend clients
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework:** Next.js 15+ (React)
@@ -35,7 +35,7 @@
 - Password encryption with BCrypt
 - Custom authorization filters
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 TriForm/
@@ -68,9 +68,9 @@ TriForm/
 └── README.md
 ```
 
-## 🚀 Recent Progress (January - February 2026)
+## Recent Progress (January - February 2026)
 
-### ✅ Completed
+### Completed
 - Full Next.js frontend scaffold with authentication pages
 - TypeScript API helper utilities (`api-helper.ts`)
 - Spring Security CORS configuration for frontend-backend communication
@@ -79,18 +79,18 @@ TriForm/
 - User registration and login workflows
 - Environment configuration setup
 
-### 🔄 In Progress
+### In Progress
 - Frontend form validation and error handling
 - Integration testing between frontend and backend
 - Protected route authentication on frontend
 
-### 📋 Next Steps
+### Next Steps
 - AI-powered training plan generation (OpenAI integration)
 - Workout logging and tracking dashboard
 - Progress analytics visualizations
 - User profile management
 
-## 🔧 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+ (frontend)
@@ -121,14 +121,14 @@ Create `.env.local` in the frontend folder:
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-## 📚 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/auth/register` | Register new user |
 | POST | `/api/auth/login` | User login |
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] AI-powered training plan generation
 - [ ] Workout logging and tracking interface
@@ -138,7 +138,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 - [ ] Integration with fitness wearables (Strava, Garmin)
 - [ ] Email notifications for training reminders
 
-## 📞 Contact
+## Contact
 
 For questions or interest, feel free to reach out!
 
