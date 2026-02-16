@@ -37,7 +37,7 @@ public class AuthorizationFilter extends OncePerRequestFilter{
 
         //Hardcored Short Circuit for non-auth access
         String requestUrl = request.getRequestURI();
-        if(requestUrl.startsWith("/api/public") || requestUrl.startsWith("/api/login") || requestUrl.startsWith("/api/register"))
+        if(requestUrl.startsWith("/api/public") || requestUrl.startsWith("/auth/login") || requestUrl.startsWith("/auth/register"))
         {
             filterChain.doFilter(request, response);
             return;
