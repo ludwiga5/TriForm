@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "TriForm",
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "interactive",
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}

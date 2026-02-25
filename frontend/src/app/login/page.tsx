@@ -15,7 +15,7 @@ export default function LoginPage(){
     const handleClick = async () => {
 
         const response = await PostRequest<LoginResponse>(
-            "/auth/login", 
+            "/account/login", 
             {username, email, password}
         );
 
@@ -40,7 +40,7 @@ return (
         />
 
         <input 
-            type="email"
+            type="text"
             placeholder="email"
             value={email}
             onChange={(e)=>setEmail(e.target.value)}
@@ -53,7 +53,7 @@ return (
             onChange={(e)=>setPassword(e.target.value)}
         />
 
-        <button type="button" onClick={handleClick}>Register</button>
+        <button type="button" onClick={handleClick}>Login</button>
     </div>
 );
 

@@ -15,7 +15,7 @@ export default function RegisterPage(){
     const handleClick = async () => {
 
         const response = await PostRequest<RegisterResponse>(
-            "/auth/register", 
+            "/account/register", 
             {username, email, password }
         );
         //Check for and output Error

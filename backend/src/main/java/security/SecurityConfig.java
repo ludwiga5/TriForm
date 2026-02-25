@@ -56,7 +56,7 @@ public class SecurityConfig {
             //Selects which enpoints require authentication
             .authorizeHttpRequests(authorize 
                 -> authorize
-                .requestMatchers("/api/public/**", "/auth/login", "/auth/register").permitAll()
+                .requestMatchers("/api/public/**", "/account/login", "/account/register").permitAll()
                 .requestMatchers("/api/profile").authenticated()
                 .anyRequest().authenticated()
             );
