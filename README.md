@@ -39,17 +39,16 @@
 
 ```
 TriForm/
-├── frontend/                     # Next.js React application
+├── frontend/                    # Next.js React application
 │   ├── src/
 │   │   ├── app/                 # Next.js app directory
-│   │   │   ├── login/           # Login page
 │   │   │   ├── register/        # Registration page
-│   │   │   └── page.tsx         # Home page
+│   │   │   └── page.tsx         # Home page with login
 │   │   ├── components/          # React components
 │   │   ├── lib/
 │   │   │   └── api-helper.ts    # API client utilities
 │   │   └── styles/              # Global styles
-│   ├── .env.local               # Environment configuration
+│   ├── .env                     # Environment configuration
 │   └── package.json
 │
 ├── backend/                      # Spring Boot application
@@ -63,6 +62,7 @@ TriForm/
 │   │   ├── repositories/        # Data access layer
 │   │   ├── security/            # Security, CORS & JWT filters
 │   │   └── services/            # Business logic
+|   ├── .env                     # Environment configuration
 │   └── pom.xml                  # Maven dependencies
 │
 └── README.md
