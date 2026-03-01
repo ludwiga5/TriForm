@@ -62,33 +62,17 @@ public class UserService {
     //Logs in User
     //Checks for user against UserRepository
     //If the user exists and information matches return JWT token
-    public JwtResponse loginUser(User user){
+    public User authenticateByIdentifier(String identifier, String rawPassword) throws UserNotFoundException, IncorrectPasswordException{
 
-        String username = user.getUsername();
-        String email = user.getEmail();
-        String rawPassword = user.getPassword();
+            //Checks for user existence from Username/email on login
+            User user = userRepository.findByEmailOrUsername(identifier, identifier)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        //Account Existence
-        if(userRepository.existsByUsername(username)){
-            user = userRepository.findByUsername(username);
-        } 
-        else if(userRepository.existsByEmail(email)){
-            user = userRepository.findByEmail(email);
-        } 
-        else{
-            throw new UserNotFoundException("Account not found");
-        }
+            if(!passwordEncoder.matches(rawPassword, user.getPassword())){
+                throw new IncorrectPasswordException("Incorrect Password");
+            }
 
-        String storedHashedPassword = user.getPassword();
-
-        //Password Matching
-        if(!passwordEncoder.matches(rawPassword, storedHashedPassword)){
-            throw new IncorrectPasswordException("Incorrect Password");
-        }
-
-        //Generates JWT
-        String token = jwtService.generateToken(username);
-        return new JwtResponse(token);
+            return user;
 
     }
 
