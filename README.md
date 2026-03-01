@@ -7,7 +7,7 @@
 - **User Authentication** — JWT-based secure authentication with user registration and login
 - **Full-Stack Setup** — Next.js frontend with Spring Boot backend, fully synchronized with CORS
 - **API Integration** — Seamless frontend-backend communication with TypeScript type safety
-- **Personalized Training Plans** — AI-powered training plan generation (in progress)
+- **Personalized Training Plans** — AI-powered training plan generation (coming soon)
 - **Workout Tracking** — Log and monitor your swims, bikes, and runs (coming soon)
 - **Progress Analytics** — Visualize your training progress over time (coming soon)
 - **Responsive Backend API** — RESTful API for seamless integration with frontend clients
@@ -116,17 +116,21 @@ mvn spring-boot:run
 
 ### Environment Setup
 
-Create `.env.local` in the frontend folder:
+Create `.env` in the frontend folder:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
+Create `.env` in the backend folder:
+```
+JWT_SECRET={your_secret}
+JWT_EXPIRATION_MS={your_token_expiration}
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | User login |
+| POST | `/api/account/register` | Register new user |
+| POST | `/api/account/login` | User login |
 
 ## Roadmap
 
