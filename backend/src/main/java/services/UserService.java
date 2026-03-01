@@ -3,7 +3,6 @@ package services;
 //Imports
 import org.springframework.stereotype.Service;
 
-import dto.JwtResponse;
 import entities.User;
 import repositories.UserRepository;
 import exceptions.UsernameAlreadyExistsException;
@@ -19,13 +18,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
 
     //Injects
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
     }
     //Registers a New User
     //Generates username, email, password and checks against the UserRepository
