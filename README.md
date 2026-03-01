@@ -124,6 +124,7 @@ Create `.env` in the backend folder:
 ```
 JWT_SECRET={your_secret}
 JWT_EXPIRATION_MS={your_token_expiration}
+```
 
 ## API Endpoints
 
