@@ -16,14 +16,13 @@ interface ApiResponse<T>{
 export async function ApiCall<T>(
     endpoint: string,
     options?: RequestInit
-): Promise<ApiResponse<T>>{
-
+): Promise<ApiResponse<T>> {
+    
     /*
     Sends a fetch request to the Backend Enpoint used in the call
     */
     try{
         const url = `${API_BASE_URL}${endpoint}`;
-        console.log("url:", url);
         const response = await fetch(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -31,17 +30,26 @@ export async function ApiCall<T>(
             },
             ...options,
         });
-    
-    /*
-    Checks for an HTTP Request Pass
-    Raises error if not
-    */
-    if(!response.ok){
-        throw new Error(`API Error: ${response.statusText}`);
-    }
 
-    const data = await response.json();
-    return { data };
+        let data = null;
+
+        try{
+            const text = await response.text();
+            data = text ? JSON.parse(text) : null;
+        } catch{
+            data = null;
+        }
+        /*
+        Checks for an HTTP Request Pass
+        Raises error if not
+        */
+        if(!response.ok) {
+            return {
+                error: data?.error || `API Error: ${response.status}`,
+            };
+        }
+
+        return {data};
     } catch(error){
         return {
             error: error instanceof Error ? error.message : "Unknown error occured",

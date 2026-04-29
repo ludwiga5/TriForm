@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "../page.module.css";
 import { useState } from "react";
 import { PostRequest } from "@/lib/api-helper";
 
@@ -12,7 +13,8 @@ export default function RegisterPage(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleClick = async () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
         const response = await PostRequest<RegisterResponse>(
             "/account/register", 
@@ -20,7 +22,7 @@ export default function RegisterPage(){
         );
         //Check for and output Error
         if (response.error){
-            console.log(response.error);
+            console.log("Error:", response.error);
         }
         //Passes and stores the JWT Token
         if (response.data){
@@ -32,28 +34,30 @@ export default function RegisterPage(){
 return (
 
     <div>
-        <input 
-            type="text"
-            placeholder="username"
-            value={username}
-            onChange={(e)=>setUsername(e.target.value)}
-        />
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
+            <input 
+                type="text"
+                placeholder="username"
+                value={username}
+                onChange={(e)=>setUsername(e.target.value)}
+            />
 
-        <input 
-            type="email"
-            placeholder="email"
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-        />
+            <input 
+                type="email"
+                placeholder="email"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
+            />
 
-        <input
-            type="password"
-            placeholder="password"
-            value={password}
-            onChange={(e)=>setPassword(e.target.value)}
-        />
+            <input
+                type="password"
+                placeholder="password"
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
+            />
 
-        <button type="button" onClick={handleClick}>Register</button>
+            <button type="submit">Register</button>
+        </form>
     </div>
 
 );
