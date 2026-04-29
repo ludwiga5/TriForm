@@ -29,7 +29,7 @@ public class UserService {
     //Then hashes the users password
     //Saves the new user in UserRepository
     //Then returns the user information
-    public User registerUser(User user){
+    public void registerUser(User user){
 
         String username = user.getUsername();
         String email = user.getEmail();
@@ -53,7 +53,7 @@ public class UserService {
         user.setPassword(null);
         
         System.out.println("Register Successful");
-        return user;
+
     
     } 
     //Logs in User

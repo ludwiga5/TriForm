@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import dto.JwtResponse;
 import entities.User;
+import exceptions.EmailAlreadyExistsException;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserNotFoundException;
+import exceptions.UsernameAlreadyExistsException;
 import services.JwtService;
 import services.UserService;
 
@@ -37,11 +39,22 @@ public class AuthController {
     //Registers user in UserService. Then sets password to 
     //null since its hash is saved during registration
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        User savedUser = userService.registerUser(user);
-        return savedUser;
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try{
+            userService.registerUser(user);
+            return ResponseEntity.status(201).body(
+                Map.of(
+                    "message", "User created successfully")
+            );
+        }
+        catch(UsernameAlreadyExistsException | EmailAlreadyExistsException e){
+            return ResponseEntity.status(409).body(
+                Map.of(                
+                    "error", e.getMessage()
+                )
+            );
+        }
     }
-
     //Login Endpoint
 
     //Checks for registered user value. If the user exists it assigns a JWT token.
@@ -56,7 +69,11 @@ public class AuthController {
             JwtResponse response = new JwtResponse(token);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException | IncorrectPasswordException e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(401).body(
+                Map.of(                  
+                    "error", e.getMessage()
+                )
+            );
         }
     }
 }
