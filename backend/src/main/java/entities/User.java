@@ -2,32 +2,28 @@ package entities;
 
 //Imports
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 //Handles User Entity
 @Entity
 @Table(name = "Users")
-public class User {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseEntity{
 
     @Column(name = "username",nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false, unique = true)
+    @Column(name = "password", nullable = false, unique = false)
     private String password;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "created_at", nullable = false, unique = false)
+    private LocalDate createdDate = LocalDate.now();
 
 
     //Get Methods
-    public Long getId(){    
-        return id;
-
-    } public String getUsername(){
+    public String getUsername(){
         return username;
 
     } public String getEmail(){
@@ -38,11 +34,7 @@ public class User {
 
     }
 
-    //Set Methods
-    public void setId(Long newId){
-        id = newId;
-
-    } public void setUsername(String newUsername){
+    public void setUsername(String newUsername){
         username = newUsername;
 
     } public void setEmail(String newEmail){

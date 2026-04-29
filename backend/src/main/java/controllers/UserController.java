@@ -29,14 +29,14 @@ public class UserController {
 
     //Requires authentication for endpoint access
     //auth token is given with the "Bearer " header which must be removed
-    //Then extracts the user based off of the token
+    //Then extracts the user based off of the token and returns id value
     @GetMapping("/profile")
-    public User profile(@RequestHeader("Authorization") String authToken) {
+    public long profile(@RequestHeader("Authorization") String authToken) {
         String token = authToken.replace("Bearer ", "");
         jwtService.validateToken(token);
         String username = jwtService.extractUsername(token);
         User user = userRepository.findByUsername(username);
-        return user;
+        return user.getId();
     }
     
     
