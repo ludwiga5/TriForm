@@ -10,6 +10,10 @@ import java.time.format.DateTimeFormatter;
 @Table(name = "Profiles")
 public class UserProfile extends BaseEntity{
 
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
     // true-metric false-imperial
     @Column(name = "metric", nullable = false, unique = false)
     private boolean metric;
