@@ -6,6 +6,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import services.JwtService;
 import repositories.UserRepository;
 import entities.User;
+import exceptions.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.MissingClaimException;
@@ -65,7 +66,8 @@ public class AuthorizationFilter extends OncePerRequestFilter{
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         if(user==null){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;

@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.WeakKeyException;
 import jakarta.annotation.PostConstruct;
 import entities.User;
 import exceptions.TokenExpiredException;
+import exceptions.UserNotFoundException;
 import repositories.UserRepository;
 import javax.crypto.SecretKey;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,8 @@ public class JwtService {
     //Generates a JWT token for a user
     public String generateToken(String username){
 
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
         long id = user.getId();
 
         //Build Token

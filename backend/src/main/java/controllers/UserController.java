@@ -2,12 +2,15 @@ package controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import entities.User;
-import services.JwtService;
+import entities.UserProfile;
+import exceptions.UserNotFoundException;
 import repositories.UserRepository;
+import repositories.UserProfileRepository;
 
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -16,27 +19,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/api")
 public class UserController {
 
-    private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
     //Injects
-    public UserController(JwtService jwtService, UserRepository userRepository){
-        this.jwtService = jwtService;
+    public UserController(UserRepository userRepository, UserProfileRepository userProfileRepository){
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     //Profile Endpoint
 
     //Requires authentication for endpoint access
-    //auth token is given with the "Bearer " header which must be removed
-    //Then extracts the user based off of the token and returns id value
+    //After authentication Spring Security stores username on Request Thread
+    //So username can be grabbed from Spring and used here for Profile GETing.
     @GetMapping("/profile")
-    public long profile(@RequestHeader("Authorization") String authToken) {
-        String token = authToken.replace("Bearer ", "");
-        jwtService.validateToken(token);
-        String username = jwtService.extractUsername(token);
-        User user = userRepository.findByUsername(username);
-        return user.getId();
+    public ResponseEntity<?> profile(@AuthenticationPrincipal String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserProfile profile = userProfileRepository.findByUserId(user.getId())
+            .orElseThrow(() -> new UserNotFoundException("Profile not found"));
+        return ResponseEntity.ok(profile);
     }
     
     
