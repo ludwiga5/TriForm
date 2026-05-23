@@ -29,6 +29,9 @@ public class UserProfile extends BaseEntity{
 
 
     // Get Methods
+    public User getUser(){
+        return user;
+    }
     public boolean getMetric(){
         return metric;
     }
@@ -47,6 +50,9 @@ public class UserProfile extends BaseEntity{
 
 
     // Set Methods
+    public void setUser(User newUser){
+        user = newUser;
+    }
     public void setMetric(boolean newMetric){
         metric = newMetric;
     }
