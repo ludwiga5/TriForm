@@ -11,6 +11,7 @@ import entities.UserProfile;
 import dto.UserProfileRequest;
 import dto.UserProfileResponse;
 import exceptions.UserNotFoundException;
+import exceptions.UserProfileNotFoundException;
 import repositories.UserRepository;
 import repositories.UserProfileRepository;
 import services.UserProfileService;
@@ -18,6 +19,7 @@ import services.UserProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -74,6 +76,28 @@ public class UserController {
         UserProfile profile = userProfileRepository.findByUserId(user.getId())
             .orElseThrow(() -> new UserNotFoundException("Profile not found"));
         return ResponseEntity.ok(new UserProfileResponse(profile));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity <?> updateProfile(@AuthenticationPrincipal String username, @RequestBody UserProfileRequest profileData) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        UserProfile profile = userProfileRepository.findByUserId(user.getId())
+            .orElseThrow(() -> new UserNotFoundException("Profile not found"));
+        try{
+            userProfileService.updateUserProfile(profile, profileData);
+            return ResponseEntity.status(201).body(
+                Map.of(
+                    "message", "User Profile created successfully")
+            );
+        }
+        catch(UserNotFoundException | UserProfileNotFoundException e){
+            return ResponseEntity.status(409).body(
+                Map.of(                
+                    "error", e.getMessage()
+                )
+            );
+        }
     }
 
 
