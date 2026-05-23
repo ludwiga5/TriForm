@@ -17,6 +17,8 @@ import repositories.UserProfileRepository;
 import services.UserProfileService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -98,6 +100,13 @@ public class UserController {
                 )
             );
         }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleBadRequest(HttpMessageNotReadableException e) {
+        return ResponseEntity.status(400).body(
+            Map.of("error", "Invalid date. Expected MM-DD-YYYY")
+        );
     }
 
 
