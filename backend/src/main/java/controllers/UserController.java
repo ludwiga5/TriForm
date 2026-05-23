@@ -11,7 +11,6 @@ import entities.UserProfile;
 import dto.UserProfileRequest;
 import dto.UserProfileResponse;
 import exceptions.UserNotFoundException;
-import exceptions.UserProfileAlreadyExistsException;
 import repositories.UserRepository;
 import repositories.UserProfileRepository;
 import services.UserProfileService;
@@ -44,8 +43,11 @@ public class UserController {
     public ResponseEntity <?> createProfile(@AuthenticationPrincipal String username, @RequestBody UserProfileRequest profileData) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
-        userProfileRepository.findByUserId(user.getId())
-            .orElseThrow(() -> new UserProfileAlreadyExistsException("Profile not found"));
+        if (userProfileRepository.findByUserId(user.getId()).isPresent()) {
+            return ResponseEntity.status(409).body(
+                Map.of("error", "Profile already exists")
+            );
+        }
         try{
             userProfileService.createUserProfile(user, profileData);
             return ResponseEntity.status(201).body(
@@ -53,7 +55,7 @@ public class UserController {
                     "message", "User Profile created successfully")
             );
         }
-        catch(UserNotFoundException | UserProfileAlreadyExistsException e){
+        catch(UserNotFoundException e){
             return ResponseEntity.status(409).body(
                 Map.of(                
                     "error", e.getMessage()
