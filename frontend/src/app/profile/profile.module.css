@@ -1,0 +1,190 @@
+.page {
+  --background: #000;
+  --foreground: #fff;
+  --accent: #922;
+
+  --text-primary: #fff;
+  --text-secondary: #808080;
+
+  --button-primary-hover: #383838;
+
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-geist-sans);
+  background-color: var(--background);
+  background-image: url('/jon-del-rivero-AjF5fv4-a2U-unsplash.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 60px 24px;
+}
+
+.intro h1 {
+  max-width: 500px;
+  font-size: 50px;
+  font-weight: 600;
+  line-height: 48px;
+  letter-spacing: -2.4px;
+  text-wrap: balance;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: var(--accent);
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  max-width: 340px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 360px;
+  padding: 32px 24px;
+  border-radius: 20px;
+  background-color: var(--foreground);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+}
+
+.profileForm h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--background);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  color: var(--background);
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Unit toggle */
+.toggleGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.toggleLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toggle {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toggleOption {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggleActive {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.primaryButton {
+  background-color: var(--accent);
+  color: var(--foreground);
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.primaryButton:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.primaryButton:active {
+  transform: scale(0.98);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c00;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+  }
+
+  .intro h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+}

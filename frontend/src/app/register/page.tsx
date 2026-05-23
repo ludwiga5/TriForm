@@ -2,64 +2,98 @@
 
 import styles from "../page.module.css";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PostRequest } from "@/lib/api-helper";
+import { RegisterResponse } from "@/lib/types";
+import { LoginResponse } from "@/lib/types";
 
-interface RegisterResponse{
-    message: string;
-}
-
-export default function RegisterPage(){
+export default function RegisterPage() {
+    const router = useRouter();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+        setErrorMessage(null);
 
         const response = await PostRequest<RegisterResponse>(
-            "/account/register", 
-            {username, email, password }
+            "/account/register",
+            { username, email, password }
         );
-        //Check for and output Error
-        if (response.error){
-            console.log("Error:", response.error);
+
+        setLoading(false);
+
+        if (response.error) {
+            setErrorMessage(response.error);
+            return;
         }
-        //Passes and stores the JWT Token
-        if (response.data){
-            console.log("Successful Registration", response.data.message);
+
+    if (response.data) {
+        // Login immediately after registration
+        const loginResponse = await PostRequest<LoginResponse>(
+            "/account/login",
+            { identifier: username, password }
+        );
+        if (loginResponse.data) {
+            localStorage.setItem("token", loginResponse.data.token);
+            router.push("/profile");
         }
-    
-};
+    }
+    };
 
-return (
-
-    <div>
-        <form onSubmit={handleSubmit} className={styles.loginForm}>
-            <input 
-                type="text"
-                placeholder="username"
-                value={username}
-                onChange={(e)=>setUsername(e.target.value)}
-            />
-
-            <input 
-                type="email"
-                placeholder="email"
-                value={email}
-                onChange={(e)=>setEmail(e.target.value)}
-            />
-
-            <input
-                type="password"
-                placeholder="password"
-                value={password}
-                onChange={(e)=>setPassword(e.target.value)}
-            />
-
-            <button type="submit">Register</button>
-        </form>
-    </div>
-
-);
-
+    return (
+        <div className={styles.page}>
+            <main className={styles.intro}>
+                <h1>Join TriForm</h1>
+                <div className={styles.card}>
+                    <form onSubmit={handleSubmit} className={styles.loginForm}>
+                        <h2>Create Account</h2>
+                        {errorMessage && (
+                            <div className={styles.error}>{errorMessage}</div>
+                        )}
+                        <input
+                            className={styles.inputField}
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                        <input
+                            className={styles.inputField}
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                        <input
+                            className={styles.inputField}
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <button
+                            className={styles.primaryButton}
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {loading ? "Creating account..." : "Register"}
+                        </button>
+                    </form>
+                    <div className={styles.ctas}>
+                        <a className={styles.secondary} href="/">
+                            Back to Login
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
 }

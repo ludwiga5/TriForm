@@ -2,7 +2,6 @@
 import styles from "./page.module.css";
 import { useState } from "react";
 import { PostRequest } from "@/lib/api-helper";
-import { text } from "stream/consumers";
 
 interface LoginResponse{
     token: string;

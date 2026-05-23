@@ -10,7 +10,7 @@ import java.time.Period;
 public class UserProfile extends BaseEntity{
 
     @OneToOne
-    @JoinColumn(name = "userId", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     // true-metric false-imperial

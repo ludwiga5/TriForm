@@ -1,27 +1,20 @@
 /*
 Used to connect the Frontend and Backend
 */
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-console.log("API_BASE_URL:", API_BASE_URL);
-
-
-interface ApiResponse<T>{
+ 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+ 
+interface ApiResponse<T> {
     data?: T;
     error?: string;
     message?: string;
 }
-
-
+ 
 export async function ApiCall<T>(
     endpoint: string,
     options?: RequestInit
 ): Promise<ApiResponse<T>> {
-    
-    /*
-    Sends a fetch request to the Backend Enpoint used in the call
-    */
-    try{
+    try {
         const url = `${API_BASE_URL}${endpoint}`;
         const response = await fetch(url, {
             headers: {
@@ -30,56 +23,70 @@ export async function ApiCall<T>(
             },
             ...options,
         });
-
+ 
         let data = null;
-
-        try{
+        try {
             const text = await response.text();
             data = text ? JSON.parse(text) : null;
-        } catch{
+        } catch {
             data = null;
         }
-        /*
-        Checks for an HTTP Request Pass
-        Raises error if not
-        */
-        if(!response.ok) {
+ 
+        if (!response.ok) {
             return {
                 error: data?.error || `API Error: ${response.status}`,
             };
         }
-
-        return {data};
-    } catch(error){
+ 
+        return { data };
+    } catch (error) {
         return {
-            error: error instanceof Error ? error.message : "Unknown error occured",
-        }
+            error: error instanceof Error ? error.message : "Unknown error occurred",
+        };
     }
 }
-
-/*
-Handles GET Requests
-*/
-export async function GetRequest<T>(
-    endpoint: string
-): Promise<ApiResponse<T>>{
-    return ApiCall<T>(
-        endpoint, 
-        {method: "GET"}
-    )
+ 
+// Retrieves token from localStorage for authenticated requests
+function getAuthHeaders(): Record<string, string> {
+    if (typeof window === "undefined") return {};
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
 }
-
-/*
-Handles POST Requests
-Converts body to JSON String
-*/
-export async function PostRequest<T>(
-    endpoint: string,
-    data: any
-): Promise<ApiResponse<T>>{
-    return ApiCall<T>(
-        endpoint, 
-        {method: "POST",
+ 
+export async function GetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, { method: "GET" });
+}
+ 
+export async function AuthGetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "GET",
+        headers: getAuthHeaders(),
+    });
+}
+ 
+export async function PostRequest<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "POST",
         body: JSON.stringify(data),
-    })
+    });
 }
+ 
+export async function AuthPostRequest<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeaders(),
+        },
+        body: JSON.stringify(data),
+    });
+}
+ 
+export async function PutRequest<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+    });
+}
+ 
