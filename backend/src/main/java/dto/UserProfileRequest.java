@@ -1,31 +1,18 @@
-package entities;
+package dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
 
-//Handles User Entity
-@Entity
-@Table(name = "Profiles")
-public class UserProfile extends BaseEntity{
+import entities.User;
 
-    @OneToOne
-    @JoinColumn(name = "userId", nullable = false, unique = true)
+public class UserProfileRequest {
+    
     private User user;
-
-    // true-metric false-imperial
-    @Column(name = "metric", nullable = false, unique = false)
     private boolean metric;
-
-    @Column(name = "height",nullable = false, unique = false)
     private float height;
-
-    @Column(name = "weight",nullable = false, unique = false)
     private float weight;
-
-    @Column(name = "age",nullable = false, unique = false)
     private int age;
-
+    private LocalDate birthday;
 
     // Get Methods
     public User getUser(){
@@ -34,19 +21,18 @@ public class UserProfile extends BaseEntity{
     public boolean getMetric(){
         return metric;
     }
-
     public float getHeight(){
         return height;
     }
-
     public float getWeight(){
         return weight;
     }
-
     public int getAge(){
         return age;
     }
-
+    public LocalDate getBirthday(){
+        return birthday;
+    }
 
     // Set Methods
     public void setUser(User newUser){
@@ -55,7 +41,6 @@ public class UserProfile extends BaseEntity{
     public void setMetric(boolean newMetric){
         metric = newMetric;
     }
-
     public void setHeight(int cm){
         height = cm;
     }
@@ -74,5 +59,4 @@ public class UserProfile extends BaseEntity{
         Period newAge = Period.between(birthday, currentDate);
         age = newAge.getYears();
     }
-
 }

@@ -2,8 +2,13 @@ package services;
 
 import entities.UserProfile;
 import repositories.UserProfileRepository;
+
+import org.springframework.stereotype.Service;
+
+import dto.UserProfileRequest;
 import entities.User;
 
+@Service
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
@@ -12,10 +17,25 @@ public class UserProfileService {
         this.userProfileRepository = userProfileRepository;
     }
     
-    public void createUserProfile(User user, UserProfile profile){
+    public void createUserProfile(User user, UserProfileRequest data){
+        UserProfile profile = new UserProfile();
         profile.setUser(user);
+        profile.setMetric(data.getMetric());
+        profile.setWeight(data.getWeight());
+        profile.setAge(data.getBirthday());
+        if(data.getMetric()) {
+            profile.setHeight((int) data.getHeight());
+        }
         userProfileRepository.save(profile);
     }
 
-
+    public void updateUserProfile(UserProfile profile, UserProfileRequest data) {
+        profile.setMetric(data.getMetric());
+        profile.setWeight(data.getWeight());
+        profile.setAge(data.getBirthday());
+        if(data.getMetric()) {
+            profile.setHeight((int) data.getHeight());
+        }
+        userProfileRepository.save(profile);
+    }
 }

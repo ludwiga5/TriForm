@@ -8,6 +8,8 @@ import java.util.Map;
 
 import entities.User;
 import entities.UserProfile;
+import dto.UserProfileRequest;
+import dto.UserProfileResponse;
 import exceptions.UserNotFoundException;
 import exceptions.UserProfileAlreadyExistsException;
 import repositories.UserRepository;
@@ -17,6 +19,7 @@ import services.UserProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -38,13 +41,13 @@ public class UserController {
     //Profile Endpoint
 
     @PostMapping("/profile")
-    public ResponseEntity <?> createProfile(@AuthenticationPrincipal String username) {
+    public ResponseEntity <?> createProfile(@AuthenticationPrincipal String username, @RequestBody UserProfileRequest profileData) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
-        UserProfile profile = userProfileRepository.findByUserId(user.getId())
+        userProfileRepository.findByUserId(user.getId())
             .orElseThrow(() -> new UserProfileAlreadyExistsException("Profile not found"));
         try{
-            userProfileService.createUserProfile(user, profile);
+            userProfileService.createUserProfile(user, profileData);
             return ResponseEntity.status(201).body(
                 Map.of(
                     "message", "User Profile created successfully")
@@ -68,7 +71,7 @@ public class UserController {
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserProfile profile = userProfileRepository.findByUserId(user.getId())
             .orElseThrow(() -> new UserNotFoundException("Profile not found"));
-        return ResponseEntity.ok(profile);
+        return ResponseEntity.ok(new UserProfileResponse(profile));
     }
 
 
