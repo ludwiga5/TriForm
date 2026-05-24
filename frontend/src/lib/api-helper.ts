@@ -89,4 +89,11 @@ export async function PutRequest<T>(endpoint: string, data: unknown): Promise<Ap
         body: JSON.stringify(data),
     });
 }
+
+export async function DeleteRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+    });
+}
  
