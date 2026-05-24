@@ -76,8 +76,17 @@ public class UserController {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserProfile profile = userProfileRepository.findByUserId(user.getId())
-            .orElseThrow(() -> new UserNotFoundException("Profile not found"));
-        return ResponseEntity.ok(new UserProfileResponse(profile));
+            .orElseThrow(() -> new UserProfileNotFoundException("Profile not found"));
+        try{
+            return ResponseEntity.ok(new UserProfileResponse(profile));
+        }
+        catch(UserNotFoundException | UserProfileNotFoundException e){
+            return ResponseEntity.status(409).body(
+                Map.of(                
+                    "error", e.getMessage()
+                )
+            );
+        }
     }
 
     @PutMapping("/profile")
