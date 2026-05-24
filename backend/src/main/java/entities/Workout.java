@@ -16,18 +16,22 @@ public class Workout extends BaseEntity{
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    // Swim, Bike, Run
     @Column(name = "discipline", nullable = false, unique = false)
     private String discipline;
 
+    // user-defined Date of workout
     @Column(name = "date", nullable = false, unique = false)
     private LocalDate date;
 
     @Column(name = "duration", nullable = false, unique = false)
     private int durationMin;
     
+    // store without label (yd/m, mile/km)
     @Column(name = "distance", nullable = false, unique = false)
     private int distance;
 
+    // user notes for workout (optional)
     @Column(name = "notes", nullable = true, unique = false)
     private String notes;
 
