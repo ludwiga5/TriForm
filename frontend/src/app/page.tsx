@@ -2,36 +2,31 @@
 import styles from "./page.module.css";
 import { useState } from "react";
 import { PostRequest } from "@/lib/api-helper";
+import { useRouter } from "next/navigation";
 
 interface LoginResponse{
     token: string;
 }
 
 export default function Home(){
-    const [identifier, setIdentifier] = useState("");
-    const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-      const handleSubmit = async (e: React.FormEvent) => {
-          e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
   
-          const response = await PostRequest<LoginResponse>(
-              "/account/login", 
-              {identifier, password}
-          );
-  
-          //Check for and output Error
-          if (response.error){
-              console.log(response.error);
-              setErrorMessage(response.error);
-          }
-          //Passes and stores the JWT Token
-          if (response.data){
-              console.log("token: ", response.data.token);
-              localStorage.setItem("token", response.data.token);
-              setErrorMessage(null);
-          }
-      };
+    const loginResponse = await PostRequest<LoginResponse>(
+      "/account/login",
+      { identifier: identifier, password }
+    );
+    if (loginResponse.data) {
+      localStorage.setItem("token", loginResponse.data.token);
+      router.push("/dashboard");
+    }
+  };
+
 
   return (
     <div className={styles.page}>
