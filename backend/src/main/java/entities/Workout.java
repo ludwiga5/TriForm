@@ -9,7 +9,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Workpouts")
+@Table(name = "Workouts")
 public class Workout extends BaseEntity{
     
     @OneToOne
