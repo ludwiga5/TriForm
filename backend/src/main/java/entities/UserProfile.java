@@ -59,10 +59,6 @@ public class UserProfile extends BaseEntity{
     public void setHeight(int cm){
         height = cm;
     }
-    public void setHeight(int feet, int inches){
-        float newHeight = feet*12+inches;
-        height = (float)(newHeight*2.54);
-    }
 
     public void setWeight(float newWeight){
         weight = newWeight;
