@@ -1,0 +1,477 @@
+/* ── Design tokens ─────────────────────────────── */
+.page {
+    --bg:             #0a0a0a;
+    --bg-surface:     #141414;
+    --bg-raised:      #1c1c1c;
+    --accent:         #922;
+    --accent-dim:     rgba(153, 34, 34, 0.15);
+    --text-primary:   #f0f0f0;
+    --text-secondary: #777;
+    --text-muted:     #444;
+    --border:         #242424;
+    --radius:         12px;
+
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg);
+    font-family: var(--font-geist-sans), Arial, sans-serif;
+    color: var(--text-primary);
+}
+
+/* ── Sidebar ───────────────────────────────────── */
+.sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+}
+
+.sidebarLogo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+    padding: 0 8px;
+}
+
+.logoMark {
+    width: 32px;
+    height: 32px;
+    background-color: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logoText {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.navItem {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.navItem:hover {
+    background-color: var(--bg-raised);
+    color: var(--text-primary);
+}
+
+.navItemActive {
+    background-color: var(--accent-dim);
+    color: var(--accent);
+}
+
+.navItemActive:hover {
+    background-color: var(--accent-dim);
+    color: var(--accent);
+}
+
+.logoutButton {
+    margin-top: auto;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.logoutButton:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ── Main ──────────────────────────────────────── */
+.main {
+    flex: 1;
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 960px;
+}
+
+/* ── Header ────────────────────────────────────── */
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.headerSub {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.headerTitle {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+}
+
+/* ── Two-column layout ─────────────────────────── */
+.content {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Section labels ────────────────────────────── */
+.sectionTitle {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+/* ── Form card ─────────────────────────────────── */
+.formSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldLabel {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.inputField {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+}
+
+.inputField:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.textArea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    resize: vertical;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.textArea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ── Discipline toggle ─────────────────────────── */
+.disciplineToggle {
+    display: flex;
+    gap: 8px;
+}
+
+.disciplineOption {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.disciplineOption:hover {
+    border-color: #333;
+    color: var(--text-primary);
+}
+
+.disciplineActive {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.disciplineActive:hover {
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+/* ── Submit button ─────────────────────────────── */
+.primaryButton {
+    background-color: var(--accent);
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.primaryButton:hover {
+    opacity: 0.88;
+}
+
+.primaryButton:active {
+    transform: scale(0.98);
+}
+
+.primaryButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error {
+    font-size: 13px;
+    color: #c00;
+    background: rgba(200, 0, 0, 0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+/* ── Workout list ──────────────────────────────── */
+.listSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.workoutList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.workoutRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    transition: border-color 0.15s;
+}
+
+.workoutRow:hover {
+    border-color: #2e2e2e;
+}
+
+.workoutIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.workoutInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+.workoutDiscipline {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.workoutHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.workoutDate {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.workoutStats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.workoutStat {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.statLabel {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.statValue {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.statDivider {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.workoutNotes {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.deleteButton:hover {
+    color: #c00;
+    background: rgba(200, 0, 0, 0.08);
+}
+
+.deleteButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Loading / empty states ────────────────────── */
+.loadingRow {
+    display: flex;
+    gap: 6px;
+    padding: 24px 0;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%       { opacity: 1;   transform: scale(1.1); }
+}
+
+.empty {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 24px 0;
+}
+
+/* ── Responsive ────────────────────────────────── */
+@media (max-width: 900px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 24px 20px; }
+    .headerTitle { font-size: 28px; }
+}

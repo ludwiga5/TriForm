@@ -9,7 +9,7 @@ public class WorkoutResponse {
     private String discipline;
     private LocalDate date;
     private int durationMin;
-    private int distance;
+    private float distance;
     private String notes;
 
     public WorkoutResponse(Workout workout){
@@ -32,7 +32,7 @@ public class WorkoutResponse {
     public int getWorkoutDurationMinutes(){
         return durationMin;
     }
-    public int getWorkoutDistance(){
+    public float getWorkoutDistance(){
         return distance;
     }
     public String getWorkoutNotes(){

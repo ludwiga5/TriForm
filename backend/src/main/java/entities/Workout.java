@@ -29,7 +29,7 @@ public class Workout extends BaseEntity{
     
     // store without label (yd/m, mile/km)
     @Column(name = "distance", nullable = false, unique = false)
-    private int distance;
+    private float distance;
 
     // user notes for workout (optional)
     @Column(name = "notes", nullable = true, unique = false)
@@ -48,7 +48,7 @@ public class Workout extends BaseEntity{
     public int getWorkoutDurationMinutes(){
         return durationMin;
     }
-    public int getWorkoutDistance(){
+    public float getWorkoutDistance(){
         return distance;
     }
     public String getWorkoutNotes(){
@@ -68,7 +68,7 @@ public class Workout extends BaseEntity{
     public void setWorkoutDurationMinutes(int newDurationMin){
         this.durationMin = newDurationMin;
     }
-    public void setWorkoutDistance(int newDistance){
+    public void setWorkoutDistance(float newDistance){
         this.distance = newDistance;
     }
     public void setWorkoutNotes(String newNotes){

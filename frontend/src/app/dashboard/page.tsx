@@ -16,7 +16,7 @@ interface UserProfile {
 const NAV_ITEMS = [
     { label: "Dashboard", href: "/dashboard", active: true },
     { label: "Training Plan", href: "/plan", active: false },
-    { label: "Log Workout", href: "/log", active: false },
+    { label: "Log Workout", href: "/log", active: true },
     { label: "Progress", href: "/progress", active: false },
     { label: "Account", href: "/account", active: false },
 ];
@@ -154,8 +154,8 @@ export default function DashboardPage() {
                             <p className={styles.panelBody}>
                                 Record your swim, bike, and run sessions with distance, duration, and perceived effort.
                             </p>
-                            <button className={styles.panelButton} disabled>
-                                Log Session
+                            <button className={styles.panelButton}>
+                                <a href="/log" className={styles.panelButton}>Log Session</a>
                             </button>
                         </div>
 
