@@ -18,6 +18,7 @@ const NAV_ITEMS = [
     { label: "Training Plan", href: "/plan", active: false },
     { label: "Log Workout", href: "/log", active: false },
     { label: "Progress", href: "/progress", active: false },
+    { label: "Account", href: "/account", active: false },
 ];
 
 const DISCIPLINES = [
