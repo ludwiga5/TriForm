@@ -103,7 +103,7 @@ public class UserController {
         }
         try{
             userProfileService.updateUserProfile(profile, profileData);
-            return ResponseEntity.status(201).body(
+            return ResponseEntity.ok(
                 Map.of(
                     "message", "User Profile created successfully")
             );

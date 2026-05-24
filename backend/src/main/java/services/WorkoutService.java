@@ -18,22 +18,27 @@ public class WorkoutService {
 
     public void createWorkout(User user, WorkoutRequest data){
         Workout workout = new Workout();
-        workout.setWorkoutDiscipline(data.getWorkoutDiscipline());
-        workout.setWorkoutDate(data.getWorkoutDate());
-        workout.setWorkoutDistance(data.getWorkoutDistance());
-        workout.setWorkoutDurationMinutes(data.getWorkoutDurationMinutes());
-        workout.setWorkoutNotes(data.getWorkoutNotes());
+        workout.setUser(user);
+        workout.setWorkoutDiscipline(data.getDiscipline());
+        workout.setWorkoutDate(data.getDate());
+        workout.setWorkoutDistance(data.getDistance());
+        workout.setWorkoutDurationMinutes(data.getDurationMin());
+        workout.setWorkoutNotes(data.getNotes());
 
         workoutRepository.save(workout);
     }
 
     public void updateWorkout(Workout workout, WorkoutRequest data){
-        workout.setWorkoutDiscipline(data.getWorkoutDiscipline());
-        workout.setWorkoutDate(data.getWorkoutDate());
-        workout.setWorkoutDistance(data.getWorkoutDistance());
-        workout.setWorkoutDurationMinutes(data.getWorkoutDurationMinutes());
-        workout.setWorkoutNotes(data.getWorkoutNotes());
+        workout.setWorkoutDiscipline(data.getDiscipline());
+        workout.setWorkoutDate(data.getDate());
+        workout.setWorkoutDistance(data.getDistance());
+        workout.setWorkoutDurationMinutes(data.getDurationMin());
+        workout.setWorkoutNotes(data.getNotes());
 
         workoutRepository.save(workout);
+    }
+
+    public void deleteWorkout(Workout workout){
+        workoutRepository.delete(workout);
     }
 }

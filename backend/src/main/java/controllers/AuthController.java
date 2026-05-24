@@ -42,7 +42,7 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody User user) {
         try{
             userService.registerUser(user);
-            return ResponseEntity.status(201).body(
+            return ResponseEntity.ok(
                 Map.of(
                     "message", "User created successfully")
             );

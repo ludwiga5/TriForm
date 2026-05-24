@@ -10,37 +10,37 @@ public class WorkoutRequest {
     private int distance;
     private String notes;
 
-        // getters
-    public String getWorkoutDiscipline(){
-        return discipline;
+    // getters
+    public String getDiscipline() { 
+        return discipline; 
     }
-    public LocalDate getWorkoutDate(){
-        return date;
+    public LocalDate getDate() { 
+        return date; 
     }
-    public int getWorkoutDurationMinutes(){
-        return durationMin;
+    public int getDurationMin() { 
+        return durationMin; 
     }
-    public int getWorkoutDistance(){
-        return distance;
+    public int getDistance() { 
+        return distance; 
     }
-    public String getWorkoutNotes(){
-        return notes;
+    public String getNotes() { 
+        return notes; 
     }
 
     // setters
-    public void setWorkoutDiscipline(String newDiscipline){
-        this.discipline = newDiscipline;
+    public void setDiscipline(String discipline) { 
+        this.discipline = discipline; 
     }
-    public void setWorkoutDate(LocalDate newDate){
-        this.date = newDate;
+    public void setDate(LocalDate date) { 
+        this.date = date; 
     }
-    public void setWorkoutDurationMinutes(int newDurationMin){
-        this.durationMin = newDurationMin;
+    public void setDurationMin(int durationMin) { 
+        this.durationMin = durationMin; 
     }
-    public void setWorkoutDistance(int newDistance){
-        this.distance = newDistance;
+    public void setDistance(int distance) { 
+        this.distance = distance; 
     }
-    public void setWorkoutNotes(String newNotes){
-        this.notes = newNotes;
-    }   
+    public void setNotes(String notes) { 
+        this.notes = notes;
+    }
 }

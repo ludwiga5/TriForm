@@ -5,15 +5,15 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Workouts")
 public class Workout extends BaseEntity{
     
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     // Swim, Bike, Run
@@ -36,6 +36,9 @@ public class Workout extends BaseEntity{
     private String notes;
 
     // getters
+    public User getUser(){
+        return user;
+    }
     public String getWorkoutDiscipline(){
         return discipline;
     }
@@ -53,6 +56,9 @@ public class Workout extends BaseEntity{
     }
 
     // setters
+    public void setUser(User newUser){
+        this.user = newUser;
+    }
     public void setWorkoutDiscipline(String newDiscipline){
         this.discipline = newDiscipline;
     }

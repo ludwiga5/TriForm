@@ -1,11 +1,10 @@
 package repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
+import java.util.List;
 
 import entities.Workout;
 
 public interface WorkoutRepository extends JpaRepository <Workout, Long>{
-
-        Optional<Workout>findByUserId(Long userId);
+        List<Workout>findByUserId(Long userId);
 }
