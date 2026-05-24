@@ -95,6 +95,12 @@ public class UserController {
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserProfile profile = userProfileRepository.findByUserId(user.getId())
             .orElseThrow(() -> new UserNotFoundException("Profile not found"));
+        // Make sure the workout belongs to the requesting user
+        if (!profile.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body(
+                Map.of("error", "Forbidden")
+            );
+        }
         try{
             userProfileService.updateUserProfile(profile, profileData);
             return ResponseEntity.status(201).body(
