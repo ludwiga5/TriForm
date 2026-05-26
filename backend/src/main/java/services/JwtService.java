@@ -2,12 +2,10 @@ package services;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
 import jakarta.annotation.PostConstruct;
 import entities.User;
-import exceptions.TokenExpiredException;
 import exceptions.UserNotFoundException;
 import repositories.UserRepository;
 import javax.crypto.SecretKey;
@@ -105,21 +103,13 @@ public class JwtService {
 
     //Validates token
     } public void validateToken(String token){
-   
-        //Checks token expiration
-        try{
-            
+    
         //Parse for Expiration
         Jwts.parserBuilder()
         .setSigningKey(this.secretKey)
         .build()
         .parseClaimsJws(token);
-        }
 
-        //Catch Invalid, Malformed, & Unsupported tokens later
-        catch(ExpiredJwtException tokenExpired){
-            throw new TokenExpiredException("Auth Expired");
-        }
 
     }
 
