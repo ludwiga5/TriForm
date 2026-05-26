@@ -142,9 +142,7 @@ export default function DashboardPage() {
                                 {profile.age} yrs
                             </span>
                             <span className={styles.profileBadgeStat}>
-                                {profile.metric
-                                    ? `${profile.weight} kg · ${Math.round(profile.height)} cm`
-                                    : `${profile.weight} lbs · ${formatImperialHeight(profile.height)}`}
+                                {profile.weight} {profile.metric ? "kg" : "lbs"} · {formatHeight(profile.height, profile.metric)}
                             </span>
                         </div>
                     )}
@@ -264,3 +262,12 @@ export default function DashboardPage() {
         </div>
     );
 }
+
+function formatHeight(heightCm: number, metric: boolean): string {
+    if (metric) return `${heightCm} cm`;
+    const totalInches = Math.round(heightCm / 2.54);
+    const feet = Math.floor(totalInches / 12);
+    const inches = totalInches % 12;
+    return `${feet}'${inches}"`;
+}
+

@@ -17,21 +17,20 @@ public class UserProfileService {
         this.userProfileRepository = userProfileRepository;
     }
     
-    public void createUserProfile(User user, UserProfileRequest data){
+    public void createUserProfile(User user, UserProfileRequest data) {
         UserProfile profile = new UserProfile();
         profile.setUser(user);
         profile.setMetric(data.getMetric());
+        profile.setHeight(data.getHeight()); // always cm from frontend
         profile.setWeight(data.getWeight());
         profile.setAge(data.getBirthday());
-        if(data.getMetric()) {
-            profile.setHeight((int) data.getHeight());
-        }
         userProfileRepository.save(profile);
     }
 
     public void updateUserProfile(UserProfile profile, UserProfileRequest data) {
         profile.setMetric(data.getMetric());
         profile.setWeight(data.getWeight());
+        profile.setHeight(data.getHeight());
         profile.setAge(data.getBirthday());
         if(data.getMetric()) {
             profile.setHeight((int) data.getHeight());
