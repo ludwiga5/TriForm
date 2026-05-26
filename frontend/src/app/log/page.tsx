@@ -25,6 +25,7 @@ const NAV_ITEMS = [
     { label: "Training Plan", href: "/plan", active: false },
     { label: "Log Workout", href: "/log", active: true },
     { label: "Progress", href: "/progress", active: false },
+    { label: "Account", href: "/account", active: false },
 ];
 
 const DISCIPLINE_META: Record<string, { icon: string; color: string }> = {
