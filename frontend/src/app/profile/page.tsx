@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./profile.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthPostRequest } from "@/lib/api-helper";
 
@@ -19,6 +19,12 @@ export default function ProfileSetupPage() {
     const [birthday, setBirthday] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) { router.push("/"); return; }
+    }, [router]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
