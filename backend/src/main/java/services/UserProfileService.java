@@ -21,7 +21,7 @@ public class UserProfileService {
         UserProfile profile = new UserProfile();
         profile.setUser(user);
         profile.setMetric(data.getMetric());
-        profile.setHeight((int) data.getHeight()); // always cm from frontend
+        profile.setHeight(data.getHeight()); // always cm from frontend
         profile.setWeight(data.getWeight());
         profile.setAge(data.getBirthday());
         userProfileRepository.save(profile);
@@ -30,6 +30,7 @@ public class UserProfileService {
     public void updateUserProfile(UserProfile profile, UserProfileRequest data) {
         profile.setMetric(data.getMetric());
         profile.setWeight(data.getWeight());
+        profile.setHeight(data.getHeight());
         profile.setAge(data.getBirthday());
         if(data.getMetric()) {
             profile.setHeight((int) data.getHeight());
