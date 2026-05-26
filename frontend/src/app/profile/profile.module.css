@@ -1,73 +1,72 @@
 .page {
-  --background: #000;
-  --foreground: #fff;
-  --accent: #922;
+  --background: #0a0a0a;
+  --foreground: #f0f0f0;
+  --accent: #992222;
+  --text-primary: #f0f0f0;
+  --text-secondary: #8a8a8a;
 
-  --text-primary: #fff;
-  --text-secondary: #808080;
-
-  --button-primary-hover: #383838;
-
-  display: flex;
   min-height: 100vh;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
-  background-image: url('/jon-del-rivero-AjF5fv4-a2U-unsplash.jpg');
+  justify-content: flex-start;
+  padding: 48px 64px;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(10, 10, 10, 0.96) 0%,
+      rgba(10, 10, 10, 0.88) 38%,
+      rgba(10, 10, 10, 0.58) 72%,
+      rgba(10, 10, 10, 0.82) 100%
+    ),
+    url('/jon-del-rivero-AjF5fv4-a2U-unsplash.jpg');
+
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
 }
 
 .intro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  padding: 60px 24px;
+  width: min(480px, 100%);
+  align-items: flex-start;
+  text-align: left;
+  gap: 18px;
+  padding: 0;
 }
 
 .intro h1 {
-  max-width: 500px;
-  font-size: 50px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
-  padding: 6px 12px;
-  border-radius: 20px;
-  background-color: var(--accent);
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  color: rgba(240, 240, 240, 0.9);
+  background: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 .subtitle {
-  font-size: 13px;
-  font-weight: 500;
   color: var(--text-secondary);
-  max-width: 340px;
+  max-width: 380px;
+  line-height: 1.6;
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 360px;
-  padding: 32px 24px;
-  border-radius: 20px;
-  background-color: var(--foreground);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
-  gap: 16px;
-  margin-top: 8px;
+  width: 400px;
+  padding: 30px 28px;
+  border-radius: 2px;
+  background: rgba(19, 20, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(8px);
+  align-items: stretch;
 }
 
 .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
 }
 
 .profileForm {
@@ -78,9 +77,9 @@
 }
 
 .profileForm h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--background);
+  color: #f0f0f0;
+  font-size: 22px;
+  letter-spacing: -0.03em;
 }
 
 .fieldGroup {
@@ -90,27 +89,23 @@
   width: 100%;
 }
 
-.fieldLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.fieldLabel,
+.toggleLabel {
+  color: #777;
+  font-size: 11px;
+  letter-spacing: 0.08em;
 }
 
 .inputField {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s;
-  color: var(--background);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  color: #f0f0f0;
 }
 
 .inputField:focus {
-  outline: none;
   border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 /* Unit toggle */
@@ -130,39 +125,24 @@
 }
 
 .toggle {
-  display: flex;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
 }
 
 .toggleOption {
-  padding: 6px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: background 0.15s, color 0.15s;
+  color: #777;
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .toggleActive {
-  background-color: var(--accent);
-  color: #fff;
+  background: rgba(153, 34, 34, 0.22);
+  color: #e04747;
 }
 
 .primaryButton {
-  background-color: var(--accent);
-  color: var(--foreground);
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  margin-top: 4px;
+  background-color: #f3df7c;
+  color: #101010;
+  border-radius: 2px;
 }
 
 .primaryButton:hover {
