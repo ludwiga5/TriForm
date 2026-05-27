@@ -89,6 +89,7 @@ public class UserController {
                 Map.of("error", "Forbidden")
             );
         }
+        userProfileService.updateUserProfile(profile, profileData);
         return ResponseEntity.ok(
             Map.of(
                 "message", "User Profile created successfully")

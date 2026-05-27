@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:triformtest;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    defer-datasource-initialization: true
+
+jwt:
+  secret: test-secret-test-secret-test-secret-test-secret-123456789
+  expiration-ms: 3600000

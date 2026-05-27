@@ -52,6 +52,7 @@ public class UserProfile extends BaseEntity{
     public void setUser(User newUser){
         user = newUser;
     }
+    
     public void setMetric(boolean newMetric){
         metric = newMetric;
     }
