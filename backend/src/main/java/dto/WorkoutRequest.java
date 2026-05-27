@@ -1,8 +1,7 @@
 package dto;
 
 import java.time.LocalDate;
-
-import entities.Workout.WorkoutType;
+import entities.WorkoutType;
 
 public class WorkoutRequest {
     

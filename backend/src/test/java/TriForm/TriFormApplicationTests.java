@@ -3,7 +3,7 @@ package TriForm;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import entities.Workout.WorkoutType;
+import entities.WorkoutType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

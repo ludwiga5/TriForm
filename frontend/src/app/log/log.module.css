@@ -225,6 +225,7 @@
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.045);
   color: #f0f0f0;
+  color-scheme: dark;
   font-size: 14px;
   font-family: inherit;
   transition:
@@ -234,6 +235,21 @@
 
 .inputField {
   height: 44px;
+}
+
+.inputField option {
+  background: #16181b;
+  color: #f0f0f0;
+}
+
+.inputField option:checked {
+  background: #992222;
+  color: #f0f0f0;
+}
+
+.inputField option:hover {
+  background: #2a2d31;
+  color: #f0f0f0;
 }
 
 .textArea {
