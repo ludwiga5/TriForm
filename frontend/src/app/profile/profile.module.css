@@ -2,155 +2,260 @@
   --background: #0a0a0a;
   --foreground: #f0f0f0;
   --accent: #992222;
+  --accent-bright: #d13a3a;
   --text-primary: #f0f0f0;
   --text-secondary: #8a8a8a;
+  --text-muted: #666;
 
   min-height: 100vh;
+  width: 100%;
+  padding: 40px 24px;
+
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 48px 64px;
+  justify-content: center;
+
+  color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, sans-serif;
 
   background:
     linear-gradient(
       90deg,
       rgba(10, 10, 10, 0.96) 0%,
-      rgba(10, 10, 10, 0.88) 38%,
-      rgba(10, 10, 10, 0.58) 72%,
-      rgba(10, 10, 10, 0.82) 100%
+      rgba(10, 10, 10, 0.86) 44%,
+      rgba(10, 10, 10, 0.7) 100%
     ),
-    url('/jon-del-rivero-AjF5fv4-a2U-unsplash.jpg');
+    url("/jon-del-rivero-AjF5fv4-a2U-unsplash.jpg");
 
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
 }
 
-.intro {
-  width: min(480px, 100%);
-  align-items: flex-start;
-  text-align: left;
-  gap: 18px;
-  padding: 0;
+.shell {
+  width: 100%;
+  max-width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
-.intro h1 {
-  font-size: clamp(40px, 6vw, 72px);
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kicker {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  color: rgba(240, 240, 240, 0.94);
+  font-size: 42px;
+  font-weight: 800;
   line-height: 0.95;
-  letter-spacing: -0.06em;
-  color: rgba(240, 240, 240, 0.9);
-  background: none;
-  padding: 0;
-  border-radius: 0;
+  letter-spacing: -0.065em;
 }
 
 .subtitle {
-  color: var(--text-secondary);
   max-width: 380px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.6;
 }
 
 .card {
-  width: 400px;
-  padding: 30px 28px;
-  border-radius: 2px;
-  background: rgba(19, 20, 22, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
-  backdrop-filter: blur(8px);
-  align-items: stretch;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
   width: 100%;
+  padding: 34px 28px;
+
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  background: rgba(19, 20, 22, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
 }
 
 .profileForm {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
-  width: 100%;
   gap: 16px;
 }
 
 .profileForm h2 {
   color: #f0f0f0;
-  font-size: 22px;
-  letter-spacing: -0.03em;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 4px;
 }
 
 .fieldGroup {
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  width: 100%;
+  gap: 7px;
 }
 
 .fieldLabel,
 .toggleLabel {
   color: #777;
   font-size: 11px;
+  font-weight: 800;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .inputField {
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 44px;
+
+  box-sizing: border-box;
+  padding: 0 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 2px;
+
+  background: rgba(255, 255, 255, 0.045);
   color: #f0f0f0;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.inputField::placeholder {
+  color: #777;
 }
 
 .inputField:focus {
-  border-color: var(--accent);
+  outline: none;
+  border-color: rgba(153, 34, 34, 0.75);
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* Unit toggle */
 .toggleGroup {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   width: 100%;
-}
 
-.toggleLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .toggle {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  overflow: hidden;
+
   border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .toggleOption {
-  color: #777;
+  min-width: 0;
+  height: 38px;
+
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+
   background: rgba(255, 255, 255, 0.045);
+  color: #777;
+
+  font-size: 13px;
+  font-weight: 800;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    color 0.16s ease,
+    background 0.16s ease;
+}
+
+.toggleOption:last-child {
+  border-right: none;
+}
+
+.toggleOption:hover {
+  color: #f0f0f0;
 }
 
 .toggleActive {
-  background: rgba(153, 34, 34, 0.22);
+  background: rgba(153, 34, 34, 0.26);
   color: #e04747;
 }
 
+.heightGrid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns: calc(50% - 6px) calc(50% - 6px);
+  column-gap: 12px;
+}
+
+.heightGrid > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.heightGrid input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .primaryButton {
+  width: 100%;
+  height: 42px;
+
+  margin-top: 6px;
+
+  border: none;
+  border-radius: 2px;
+
   background-color: #f3df7c;
   color: #101010;
-  border-radius: 2px;
+
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.1s ease;
 }
 
 .primaryButton:hover {
-  background-color: var(--button-primary-hover);
+  opacity: 0.88;
 }
 
 .primaryButton:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 
 .primaryButton:disabled {
@@ -159,18 +264,35 @@
 }
 
 .error {
-  color: #c00;
+  padding: 10px 12px;
+
+  color: #ff6b6b;
+  background: rgba(153, 34, 34, 0.12);
+  border: 1px solid rgba(153, 34, 34, 0.25);
+
   font-size: 13px;
-  text-align: center;
+  text-align: left;
 }
 
-@media (max-width: 600px) {
-  .card {
-    width: 100%;
+@media (max-width: 700px) {
+  .page {
+    padding: 28px 18px;
   }
 
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
+  .shell {
+    max-width: 100%;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .card {
+    padding: 30px 22px;
+  }
+
+  .heightGrid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
   }
 }

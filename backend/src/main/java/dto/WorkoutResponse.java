@@ -3,6 +3,7 @@ package dto;
 import java.time.LocalDate;
 
 import entities.Workout;
+import entities.Workout.WorkoutType;
 
 public class WorkoutResponse {
     private Long id;
@@ -11,6 +12,8 @@ public class WorkoutResponse {
     private int durationMin;
     private float distance;
     private String notes;
+    private String title;
+    private WorkoutType type;
 
     public WorkoutResponse(Workout workout){
         this.id = workout.getId();
@@ -19,6 +22,8 @@ public class WorkoutResponse {
         this.durationMin = workout.getWorkoutDurationMinutes();
         this.distance = workout.getWorkoutDistance();
         this.notes = workout.getWorkoutNotes();
+        this.type = workout.getWorkoutType();
+        this.title = workout.getWorkoutTitle();
     }
     public Long getId(){
         return id;
@@ -37,5 +42,11 @@ public class WorkoutResponse {
     }
     public String getWorkoutNotes(){
         return notes;
+    }
+    public WorkoutType getWorkoutType() { 
+        return type; 
+    }
+    public String getWorkoutTitle() { 
+        return title; 
     }
 }

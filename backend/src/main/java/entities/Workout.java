@@ -12,6 +12,15 @@ import jakarta.persistence.Table;
 @Table(name = "Workouts")
 public class Workout extends BaseEntity{
     
+    public enum WorkoutType {
+        EASY,
+        RECOVERY,
+        TEMPO,
+        INTERVALS,
+        LONG,
+        RACE,
+    };
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -35,6 +44,12 @@ public class Workout extends BaseEntity{
     @Column(name = "notes", nullable = true, unique = false)
     private String notes;
 
+    @Column(name = "type", nullable = true, unique = false)
+    private WorkoutType type;
+
+    @Column(name = "title", nullable = true, unique = false)
+    private String title;
+
     // getters
     public User getUser(){
         return user;
@@ -53,6 +68,12 @@ public class Workout extends BaseEntity{
     }
     public String getWorkoutNotes(){
         return notes;
+    }
+    public WorkoutType getWorkoutType(){
+        return type;
+    }
+    public String getWorkoutTitle(){
+        return title;
     }
 
     // setters
@@ -74,5 +95,11 @@ public class Workout extends BaseEntity{
     public void setWorkoutNotes(String newNotes){
         this.notes = newNotes;
     }   
+    public void setWorkoutType(WorkoutType newType){
+        this.type = newType;
+    }
+    public void setWorkoutTitle(String newTitle){
+        this.title = newTitle;
+    }
 
 }
