@@ -24,7 +24,7 @@ public class TrainingPlan extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(name = "plan_status", nullable = false)
-    private PlanStatus status = PlanStatus.ACTIVE;
+    private PlanStatus status;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;

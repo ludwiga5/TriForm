@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import entities.PlannedWorkout;
 
-public interface PlannedWorkoutRepositoy extends JpaRepository <PlannedWorkout, Long> {
+public interface PlannedWorkoutRepository extends JpaRepository <PlannedWorkout, Long> {
 
     List<PlannedWorkout> findByUserId(Long userId);
     List<PlannedWorkout> findByTrainingPlanId(Long trainingPlanId);

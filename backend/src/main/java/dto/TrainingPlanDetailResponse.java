@@ -8,6 +8,7 @@ import entities.RaceType;
 
 public class TrainingPlanDetailResponse {
     
+    private Long id;
     private Long raceGoalId;
     private String raceName;
     private RaceType raceType;
@@ -21,6 +22,9 @@ public class TrainingPlanDetailResponse {
     private List<PlannedWorkoutResponse> workouts;
 
     // getters
+    public Long getId(){
+        return id;
+    }
     public Long getRaceGoalId() {
         return raceGoalId;
     }
@@ -66,6 +70,9 @@ public class TrainingPlanDetailResponse {
     }
 
     // setters
+    public void setId(Long id) {
+        this.id = id;
+    }
     public void setRaceGoalId(Long raceGoalId) {
         this.raceGoalId = raceGoalId;
     }
