@@ -9,7 +9,7 @@ public class WorkoutRequest {
     private String discipline;
     private LocalDate date;
     private int durationMin;
-    private int distance;
+    private float distance;
     private String notes;
     private WorkoutType type;
     private String title;
@@ -24,7 +24,7 @@ public class WorkoutRequest {
     public int getDurationMin() { 
         return durationMin; 
     }
-    public int getDistance() { 
+    public float getDistance() { 
         return distance; 
     }
     public String getNotes() { 
@@ -47,7 +47,7 @@ public class WorkoutRequest {
     public void setDurationMin(int durationMin) { 
         this.durationMin = durationMin; 
     }
-    public void setDistance(int distance) { 
+    public void setDistance(float distance) { 
         this.distance = distance; 
     }
     public void setNotes(String notes) { 
