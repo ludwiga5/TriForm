@@ -28,7 +28,6 @@ public class UserProfileService {
     }
 
     public void updateUserProfile(UserProfile profile, UserProfileRequest data) {
-        System.out.println("UPDATING METRIC TO: " + data.getMetric());
         profile.setMetric(data.getMetric());
         profile.setWeight(data.getWeight());
         profile.setHeight(data.getHeight());

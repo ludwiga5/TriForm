@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dto.GeneratePlanRequest;
 import dto.PlannedWorkoutResponse;
 import dto.TrainingPlanDetailResponse;
+import dto.TrainingPlanResponse;
 import entities.PlanStatus;
 import entities.PlannedWorkout;
 import repositories.PlannedWorkoutRepository;
@@ -16,6 +18,7 @@ import entities.RaceGoal;
 import entities.TrainingPlan;
 import entities.User;
 import entities.WorkoutType;
+import exceptions.TrainingPlanNotFoundException;
 import repositories.RaceGoalRepository;
 import repositories.TrainingPlanRepository;
 import entities.RaceType;
@@ -56,7 +59,7 @@ public class TrainingPlanService {
         // work backwards from raceday by weeks adjust for RaceType
         plan.setStartDate(startDate);
         if (startDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Race date is too soon for a full training plan. Setting Start date to today");
+            throw new IllegalArgumentException("Race date is too soon for a full training plan");
         }
         plan.setEndDate(planRequest.getRaceDay());
         plan.setGoal(savedRaceGoal);
@@ -70,6 +73,16 @@ public class TrainingPlanService {
         List<PlannedWorkout> workouts = plannedWorkoutRepository.findByTrainingPlanIdOrderByScheduledDateAsc(savedPlan.getId());
     
         return buildTrainingPlanDetailResponse(savedPlan, workouts);
+    }
+
+/*    public TrainingPlanDetailResponse updatePlan(TrainingPlan plan, GeneratePlanRequest planData) {
+        
+    }
+*/
+    @Transactional
+    public void deletePlan(TrainingPlan plan) {
+        plannedWorkoutRepository.deleteByTrainingPlanId(plan.getId());
+        trainingPlanRepository.delete(plan);
     }
 
     // basic plan generator - increases distance + time weekly
@@ -248,6 +261,51 @@ public class TrainingPlanService {
 
         return response;
     }
+
+    public List<TrainingPlanResponse> getPlansForUser(User user){
+        List<TrainingPlan> plans = trainingPlanRepository.findByUserId(user.getId());
+        List<TrainingPlanResponse> response = plans.stream()
+        .map(plan -> {
+            TrainingPlanResponse dto = new TrainingPlanResponse();
+
+            dto.setId(plan.getId());
+            dto.setRaceGoalId(plan.getGoal().getId());
+            dto.setRaceName(plan.getGoal().getRaceName());
+            dto.setRaceType(plan.getGoal().getRaceType());
+            dto.setRaceDay(plan.getGoal().getRaceDay());
+            dto.setLocation(plan.getGoal().getLocation());
+            dto.setStatus(plan.getStatus());
+            dto.setStartDate(plan.getStartDate());
+            dto.setEndDate(plan.getEndDate());
+            dto.setCreatedDate(plan.getCreatedDate());
+
+            int totalWorkouts = plannedWorkoutRepository
+                .findByTrainingPlanId(plan.getId())
+                .size();
+
+            dto.setTotalWorkouts(totalWorkouts);
+
+            return dto;
+        })
+        .toList();
+
+        return response;
+    }
+
+    public TrainingPlanDetailResponse getPlanDetails(User user, Long id) {
+        TrainingPlan plan = trainingPlanRepository.findById(id)
+            .orElseThrow(() -> new TrainingPlanNotFoundException("Training Plan not found"));
+
+        if (!plan.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Forbidden");
+        }
+
+        List<PlannedWorkout> workouts = plannedWorkoutRepository
+            .findByTrainingPlanIdOrderByScheduledDateAsc(plan.getId());
+
+        return buildTrainingPlanDetailResponse(plan, workouts);
+    }
+
 }
 
 

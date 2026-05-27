@@ -11,5 +11,6 @@ public interface PlannedWorkoutRepository extends JpaRepository <PlannedWorkout,
     List<PlannedWorkout> findByUserId(Long userId);
     List<PlannedWorkout> findByTrainingPlanId(Long trainingPlanId);
     List<PlannedWorkout> findByTrainingPlanIdOrderByScheduledDateAsc(Long trainingPlanId);
+    void deleteByTrainingPlanId(Long trainingPlanId);
 
 }
