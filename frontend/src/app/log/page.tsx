@@ -3,7 +3,7 @@
 import styles from "./log.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthGetRequest, AuthPostRequest, DeleteRequest } from "@/lib/api-helper";
+import { AuthGetRequest, AuthPostRequest, PutRequest, DeleteRequest } from "@/lib/api-helper";
 
 type WorkoutType = "EASY" | "RECOVERY" | "TEMPO" | "INTERVALS" | "LONG" | "RACE";
 
@@ -38,6 +38,7 @@ const NAV_ITEMS = [
     { label: "Training Plan", href: "/plan", active: false },
     { label: "Log Workout", href: "/log", active: true },
     { label: "Progress", href: "/progress", active: false },
+    { label: "Account", href: "/account", active: false },
 ];
 
 const DISCIPLINE_META: Record<string, { short: string; color: string }> = {
@@ -78,6 +79,7 @@ export default function LogPage() {
     const [distance, setDistance] = useState("");
     const [notes, setNotes] = useState("");
 
+    const [editingId, setEditingId] = useState<number | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
@@ -97,6 +99,11 @@ export default function LogPage() {
             AuthGetRequest<UserProfile>("/api/profile"),
             AuthGetRequest<Workout[]>("/api/workout"),
         ]).then(([profileRes, workoutsRes]) => {
+            if (profileRes.error === "Profile not found") {
+                router.push("/profile");
+                return;
+            }
+
             if (profileRes.error || workoutsRes.error) {
                 localStorage.removeItem("token");
                 router.push("/");
@@ -128,38 +135,73 @@ export default function LogPage() {
         }
     }
 
+    function resetForm() {
+        setTitle("");
+        setDiscipline("Run");
+        setType("EASY");
+        setDate(todayISO());
+        setDurationMin("");
+        setDistance("");
+        setNotes("");
+        setEditingId(null);
+        setFormError(null);
+    }
+
+    function startEditing(workout: Workout) {
+        setEditingId(workout.id);
+        setTitle(workout.workoutTitle || "");
+        setDiscipline(workout.workoutDiscipline);
+        setType(workout.workoutType ?? "EASY");
+        setDate(workout.workoutDate);
+        setDurationMin(String(workout.workoutDurationMinutes));
+        setDistance(String(workout.workoutDistance));
+        setNotes(workout.workoutNotes ?? "");
+        setFormError(null);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setFormError(null);
 
         const trimmedTitle = title.trim();
+        const parsedDuration = parseInt(durationMin);
+        const parsedDistance = parseFloat(distance);
 
         if (!trimmedTitle) {
             setFormError("Enter a workout title.");
             return;
         }
 
-        if (!durationMin || parseInt(durationMin) <= 0) {
+        if (!parsedDuration || parsedDuration <= 0) {
             setFormError("Enter a valid duration.");
             return;
         }
 
-        if (!distance || parseFloat(distance) <= 0) {
+        if (!parsedDistance || parsedDistance <= 0) {
             setFormError("Enter a valid distance.");
             return;
         }
 
-        setSubmitting(true);
-
-        const res = await AuthPostRequest("/api/workout", {
+        const workoutBody = {
             title: trimmedTitle,
             discipline,
             type,
             date,
-            durationMin: parseInt(durationMin),
-            distance: parseFloat(distance),
+            durationMin: parsedDuration,
+            distance: parsedDistance,
             notes: notes.trim(),
-        });
+        };
+
+        setSubmitting(true);
+
+        const res = editingId
+            ? await PutRequest(`/api/workout/${editingId}`, workoutBody)
+            : await AuthPostRequest("/api/workout", workoutBody);
 
         setSubmitting(false);
 
@@ -168,13 +210,7 @@ export default function LogPage() {
             return;
         }
 
-        setTitle("");
-        setType("EASY");
-        setDate(todayISO());
-        setDurationMin("");
-        setDistance("");
-        setNotes("");
-
+        resetForm();
         fetchWorkouts();
     }
 
@@ -187,6 +223,10 @@ export default function LogPage() {
             await fetchWorkouts();
         } else {
             setWorkouts((prev) => prev.filter((workout) => workout.id !== id));
+        }
+
+        if (editingId === id) {
+            resetForm();
         }
 
         setDeletingId(null);
@@ -223,12 +263,12 @@ export default function LogPage() {
             <main className={styles.main}>
                 <header className={styles.header}>
                     <p className={styles.headerSub}>Track your training</p>
-                    <h1 className={styles.headerTitle}>Log Workout</h1>
+                    <h1 className={styles.headerTitle}>{editingId ? "Edit Workout" : "Log Workout"}</h1>
                 </header>
 
                 <div className={styles.content}>
                     <section className={styles.formSection}>
-                        <h2 className={styles.sectionTitle}>New Session</h2>
+                        <h2 className={styles.sectionTitle}>{editingId ? "Update Session" : "New Session"}</h2>
 
                         <div className={styles.card}>
                             <form onSubmit={handleSubmit} className={styles.form}>
@@ -321,8 +361,14 @@ export default function LogPage() {
                                 </div>
 
                                 <button className={styles.primaryButton} type="submit" disabled={submitting}>
-                                    {submitting ? "Saving..." : "Log Session"}
+                                    {submitting ? "Saving..." : editingId ? "Update Session" : "Log Session"}
                                 </button>
+
+                                {editingId && (
+                                    <button className={styles.secondaryButton} type="button" onClick={resetForm} disabled={submitting}>
+                                        Cancel Edit
+                                    </button>
+                                )}
                             </form>
                         </div>
                     </section>
@@ -343,9 +389,10 @@ export default function LogPage() {
                                 {workouts.map((workout) => {
                                     const meta = DISCIPLINE_META[workout.workoutDiscipline] ?? { short: "TR", color: "#555" };
                                     const workoutUnit = distanceUnit(workout.workoutDiscipline, metric);
+                                    const isEditing = editingId === workout.id;
 
                                     return (
-                                        <div key={workout.id} className={styles.workoutRow}>
+                                        <div key={workout.id} className={`${styles.workoutRow} ${isEditing ? styles.workoutRowActive : ""}`}>
                                             <span className={styles.workoutIcon} style={{ background: meta.color + "22", color: meta.color }}>
                                                 {meta.short}
                                             </span>
@@ -387,14 +434,20 @@ export default function LogPage() {
                                                 {workout.workoutNotes && <span className={styles.workoutNotes}>{workout.workoutNotes}</span>}
                                             </div>
 
-                                            <button
-                                                className={styles.deleteButton}
-                                                onClick={() => handleDelete(workout.id)}
-                                                disabled={deletingId === workout.id}
-                                                aria-label="Delete workout"
-                                            >
-                                                {deletingId === workout.id ? "..." : "Delete"}
-                                            </button>
+                                            <div className={styles.rowActions}>
+                                                <button className={styles.editButton} onClick={() => startEditing(workout)} disabled={submitting || deletingId === workout.id}>
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    className={styles.deleteButton}
+                                                    onClick={() => handleDelete(workout.id)}
+                                                    disabled={deletingId === workout.id}
+                                                    aria-label="Delete workout"
+                                                >
+                                                    {deletingId === workout.id ? "..." : "Delete"}
+                                                </button>
+                                            </div>
                                         </div>
                                     );
                                 })}
