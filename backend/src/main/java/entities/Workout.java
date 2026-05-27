@@ -4,22 +4,15 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "Workouts")
 public class Workout extends BaseEntity{
-    
-    public enum WorkoutType {
-        EASY,
-        RECOVERY,
-        TEMPO,
-        INTERVALS,
-        LONG,
-        RACE,
-    };
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -44,6 +37,7 @@ public class Workout extends BaseEntity{
     @Column(name = "notes", nullable = true, unique = false)
     private String notes;
 
+    @Enumerated(EnumType.STRING) 
     @Column(name = "type", nullable = true, unique = false)
     private WorkoutType type;
 
