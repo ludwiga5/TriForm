@@ -2,6 +2,8 @@ package dto;
 
 import java.time.LocalDate;
 
+import entities.Workout.WorkoutType;
+
 public class WorkoutRequest {
     
     private String discipline;
@@ -9,6 +11,8 @@ public class WorkoutRequest {
     private int durationMin;
     private int distance;
     private String notes;
+    private WorkoutType type;
+    private String title;
 
     // getters
     public String getDiscipline() { 
@@ -26,6 +30,12 @@ public class WorkoutRequest {
     public String getNotes() { 
         return notes; 
     }
+    public WorkoutType getType() { 
+        return type; 
+    }
+    public String getTitle() { 
+        return title; 
+    }
 
     // setters
     public void setDiscipline(String discipline) { 
@@ -42,5 +52,11 @@ public class WorkoutRequest {
     }
     public void setNotes(String notes) { 
         this.notes = notes;
+    }
+    public void setType(WorkoutType type) { 
+        this.type = type;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

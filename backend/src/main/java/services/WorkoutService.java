@@ -24,7 +24,8 @@ public class WorkoutService {
         workout.setWorkoutDistance(data.getDistance());
         workout.setWorkoutDurationMinutes(data.getDurationMin());
         workout.setWorkoutNotes(data.getNotes());
-
+        workout.setWorkoutType(data.getType());
+        workout.setWorkoutTitle(data.getTitle());
         workoutRepository.save(workout);
     }
 
@@ -34,7 +35,8 @@ public class WorkoutService {
         workout.setWorkoutDistance(data.getDistance());
         workout.setWorkoutDurationMinutes(data.getDurationMin());
         workout.setWorkoutNotes(data.getNotes());
-
+        workout.setWorkoutType(data.getType());
+        workout.setWorkoutTitle(data.getTitle());
         workoutRepository.save(workout);
     }
 

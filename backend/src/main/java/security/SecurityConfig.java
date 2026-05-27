@@ -2,6 +2,7 @@ package security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -54,12 +55,12 @@ public class SecurityConfig {
             .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
             
             //Selects which enpoints require authentication
-            .authorizeHttpRequests(authorize 
-                -> authorize
-                .requestMatchers("/api/public/**", "/account/login", "/account/register").permitAll()
-                .requestMatchers("/api/profile").authenticated()
-                .anyRequest().authenticated()
-            );
+            .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/api/public/**", "/account/login", "/account/register").permitAll()
+            .requestMatchers("/api/profile").authenticated()
+            .anyRequest().authenticated()
+        );
 
 
         return http.build();

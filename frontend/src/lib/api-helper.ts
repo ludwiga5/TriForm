@@ -1,122 +1,132 @@
-/*
-Used to connect the Frontend and Backend
-*/
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
     data?: T;
     error?: string;
     message?: string;
 }
 
 function handleUnauthorized() {
-    if (typeof window === "undefined") return;
-
-    localStorage.removeItem("token");
-
-    if (window.location.pathname !== "/") {
+    if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
         window.location.href = "/";
     }
 }
 
-export async function ApiCall<T>(
+async function ApiCall<T>(
     endpoint: string,
-    options?: RequestInit
+    options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
     try {
-        const url = `${API_BASE_URL}${endpoint}`;
-        const response = await fetch(url, {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
             headers: {
                 "Content-Type": "application/json",
-                ...options?.headers,
+                ...(options.headers || {}),
             },
-            ...options,
         });
 
-        let data = null;
-        try {
-            const text = await response.text();
-            data = text ? JSON.parse(text) : null;
-        } catch {
-            data = null;
-        }
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
 
         if (response.status === 401) {
             handleUnauthorized();
-
-            return {
-                error: "Your session expired. Please log in again.",
-            };
+            return { error: "Session expired. Please log in again." };
         }
 
         if (!response.ok) {
             return {
-                error: data?.error || `API Error: ${response.status}`,
+                error:
+                    data?.error ||
+                    data?.message ||
+                    `API Error: ${response.status}`,
             };
         }
 
         return { data };
     } catch (error) {
         return {
-            error: error instanceof Error ? error.message : "Unknown error occurred",
+            error:
+                error instanceof Error
+                    ? error.message
+                    : "Something went wrong.",
         };
     }
 }
 
-// Retrieves token from localStorage for authenticated requests
-function getAuthHeaders(): Record<string, string> {
-    if (typeof window === "undefined") return {};
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
+export function getAuthHeaders(): HeadersInit {
+    const token =
+        typeof window !== "undefined"
+            ? localStorage.getItem("token")
+            : null;
+
+    if (!token) {
+        return {};
+    }
+
+    return {
+        Authorization: `Bearer ${token}`,
+    };
 }
 
-export async function GetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return ApiCall<T>(endpoint, { method: "GET" });
-}
-
-export async function AuthGetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+export function GetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
     return ApiCall<T>(endpoint, {
         method: "GET",
-        headers: getAuthHeaders(),
     });
 }
 
-export async function PostRequest<T>(
+export function AuthGetRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return ApiCall<T>(endpoint, {
+        method: "GET",
+        headers: {
+            ...getAuthHeaders(),
+        },
+    });
+}
+
+export function PostRequest<T>(
     endpoint: string,
-    data: unknown
+    body: unknown
 ): Promise<ApiResponse<T>> {
     return ApiCall<T>(endpoint, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
     });
 }
 
-export async function AuthPostRequest<T>(
+export function AuthPostRequest<T>(
     endpoint: string,
-    data: unknown
+    body: unknown
 ): Promise<ApiResponse<T>> {
     return ApiCall<T>(endpoint, {
         method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
+        headers: {
+            ...getAuthHeaders(),
+        },
+        body: JSON.stringify(body),
     });
 }
 
-export async function PutRequest<T>(
+export function PutRequest<T>(
     endpoint: string,
-    data: unknown
+    body: unknown
 ): Promise<ApiResponse<T>> {
     return ApiCall<T>(endpoint, {
         method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
+        headers: {
+            ...getAuthHeaders(),
+        },
+        body: JSON.stringify(body),
     });
 }
 
-export async function DeleteRequest<T>(endpoint: string): Promise<ApiResponse<T>> {
+export function DeleteRequest<T = unknown>(
+    endpoint: string
+): Promise<ApiResponse<T>> {
     return ApiCall<T>(endpoint, {
         method: "DELETE",
-        headers: getAuthHeaders(),
+        headers: {
+            ...getAuthHeaders(),
+        },
     });
 }

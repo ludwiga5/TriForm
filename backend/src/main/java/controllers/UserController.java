@@ -16,6 +16,7 @@ import repositories.UserRepository;
 import repositories.UserProfileRepository;
 import services.UserProfileService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,20 +53,11 @@ public class UserController {
                 Map.of("error", "Profile already exists")
             );
         }
-        try{
-            userProfileService.createUserProfile(user, profileData);
-            return ResponseEntity.status(201).body(
-                Map.of(
-                    "message", "User Profile created successfully")
-            );
-        }
-        catch(UserNotFoundException e){
-            return ResponseEntity.status(409).body(
-                Map.of(                
-                    "error", e.getMessage()
-                )
-            );
-        }
+        userProfileService.createUserProfile(user, profileData);
+        return ResponseEntity.status(201).body(
+            Map.of(
+                "message", "User Profile created successfully")
+        );
     }
 
     //Requires authentication for endpoint access
@@ -76,17 +68,13 @@ public class UserController {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserProfile profile = userProfileRepository.findByUserId(user.getId())
-            .orElseThrow(() -> new UserProfileNotFoundException("Profile not found"));
-        try{
-            return ResponseEntity.ok(new UserProfileResponse(profile));
+            .orElse(null);
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("error", "Profile not found"));
         }
-        catch(UserNotFoundException | UserProfileNotFoundException e){
-            return ResponseEntity.status(409).body(
-                Map.of(                
-                    "error", e.getMessage()
-                )
-            );
-        }
+
+        return ResponseEntity.ok(new UserProfileResponse(profile));
     }
 
     @PutMapping("/profile")
@@ -101,20 +89,22 @@ public class UserController {
                 Map.of("error", "Forbidden")
             );
         }
-        try{
-            userProfileService.updateUserProfile(profile, profileData);
-            return ResponseEntity.ok(
-                Map.of(
-                    "message", "User Profile created successfully")
-            );
-        }
-        catch(UserNotFoundException | UserProfileNotFoundException e){
-            return ResponseEntity.status(409).body(
-                Map.of(                
-                    "error", e.getMessage()
-                )
-            );
-        }
+        return ResponseEntity.ok(
+            Map.of(
+                "message", "User Profile created successfully")
+        );
+
+    }
+
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+        return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+    }
+
+    @ExceptionHandler(UserProfileNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFound(UserProfileNotFoundException e) {
+        return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
