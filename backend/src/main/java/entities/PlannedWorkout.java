@@ -51,7 +51,7 @@ public class PlannedWorkout extends BaseEntity {
     private int weekNumber;
 
     @Column(name = "completed", nullable = false, unique = false)
-    private Boolean completed = false;
+    private Boolean completed;
 
     // getters
     public TrainingPlan getTrainingPlan() {
