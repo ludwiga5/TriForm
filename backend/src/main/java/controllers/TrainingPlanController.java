@@ -19,6 +19,7 @@ import entities.TrainingPlan;
 import dto.GeneratePlanRequest;
 import dto.TrainingPlanDetailResponse;
 import exceptions.UserNotFoundException;
+import exceptions.WorkoutNotFoundException;
 import repositories.PlannedWorkoutRepository;
 import repositories.TrainingPlanRepository;
 import repositories.UserRepository;
@@ -99,19 +100,36 @@ public class TrainingPlanController {
 
     //  Planned Workout Endpoints
 
-    @PutMapping("/plans/workouts/{id}/complete")
-    public ResponseEntity<?> completePlannedWorkout(
+    @PutMapping("/plans/workouts/{id}/toggle-complete")
+    public ResponseEntity<?> togglePlannedWorkout(
         @AuthenticationPrincipal String username,
         @PathVariable Long id)
     {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));   
-        return ResponseEntity.ok(trainingPlanService.markPlannedWorkoutComplete(user, id));
+        return ResponseEntity.ok(trainingPlanService.togglePlannedWorkoutComplete(user, id));
+    }
 
+    @GetMapping("plans/workouts/today")
+    public ResponseEntity<?> todayPlannedWorkouts(@AuthenticationPrincipal String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return ResponseEntity.ok(trainingPlanService.getTodayPlannedWorkouts(user));
+    }
+
+    @GetMapping("plans/workouts/week")
+    public ResponseEntity<?> weekPlannedWorkouts(@AuthenticationPrincipal String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return ResponseEntity.ok(trainingPlanService.getWeekPlannedWorkouts(user));        
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+        return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+    }
+    @ExceptionHandler(WorkoutNotFoundException.class)
+    public ResponseEntity<?> handleWorkoutNotFound(WorkoutNotFoundException e) {
         return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
     }
     @ExceptionHandler(TrainingPlanNotFoundException.class)

@@ -307,7 +307,7 @@ public class TrainingPlanService {
         return buildTrainingPlanDetailResponse(plan, workouts);
     }
 
-    public PlannedWorkoutResponse markPlannedWorkoutComplete(User user, Long plannedWorkoutId) {
+    public PlannedWorkoutResponse togglePlannedWorkoutComplete(User user, Long plannedWorkoutId) {
         PlannedWorkout plannedWorkout = plannedWorkoutRepository.findById(plannedWorkoutId)
             .orElseThrow(() -> new WorkoutNotFoundException("Planned workout not found"));
 
@@ -315,10 +315,37 @@ public class TrainingPlanService {
             throw new SecurityException("Forbidden");
         }
 
-        plannedWorkout.setCompleted(true);
+        plannedWorkout.setCompleted(!plannedWorkout.getCompleted());
         PlannedWorkout savedWorkout = plannedWorkoutRepository.save(plannedWorkout);
         
         return new PlannedWorkoutResponse(savedWorkout);
+    }
+
+    public List<PlannedWorkoutResponse> getTodayPlannedWorkouts(User user) {
+       
+        LocalDate today = LocalDate.now();
+
+        return plannedWorkoutRepository
+        .findByUserIdAndScheduledDateOrderByDisciplineAsc(user.getId(), today)
+        .stream()
+        .map(PlannedWorkoutResponse::new)
+        .toList();
+        
+    }
+
+    public List<PlannedWorkoutResponse> getWeekPlannedWorkouts(User user) {
+       
+        LocalDate today = LocalDate.now();
+        // monday as start of week
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+
+        return plannedWorkoutRepository
+        .findByUserIdAndScheduledDateBetweenOrderByScheduledDateAsc(user.getId(), startOfWeek, endOfWeek)
+        .stream()
+        .map(PlannedWorkoutResponse::new)
+        .toList();
+        
     }
 }
 
