@@ -37,6 +37,14 @@ function distanceUnit(discipline: string, metric: boolean): string {
     return metric ? "km" : "mi";
 }
 
+function formatImperialHeight(heightCm: number): string {
+    const totalInches = Math.round(heightCm / 2.54);
+    const feet = Math.floor(totalInches / 12);
+    const inches = totalInches % 12;
+
+    return `${feet}'${inches}"`;
+}
+
 export default function DashboardPage() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -102,7 +110,7 @@ export default function DashboardPage() {
                         <span className={styles.profileBadgeStat}>
                             {profile.metric
                                 ? `${profile.weight} kg · ${profile.height} cm`
-                                : `${profile.weight} lbs · ${profile.height}"`}
+                                : `${profile.weight} lbs · ${formatImperialHeight(profile.height)}`}
                         </span>
                     </div>
                 )}
