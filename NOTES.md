@@ -27,6 +27,10 @@
 - Automatic missed workout detection
 - AI-assisted plan generation
 
+### Go back & fix later
+
+- first WorkoutLog = 201 Created / duplicate WorkoutLog = 200 OK
+
 
 ## What I learned/Stuggled with
 
