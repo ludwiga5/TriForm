@@ -227,16 +227,14 @@ export default function DashboardPage() {
                         <div className={styles.panel}>
                             <div className={styles.panelHeader}>
                                 <span className={styles.panelTitle}>Training Plan</span>
-                                <span className={styles.panelBadge}>Soon</span>
+                                <span className={styles.panelBadge}>Active</span>
                             </div>
-
                             <p className={styles.panelBody}>
-                                Generate a personalized week-by-week triathlon plan based on your race goal, schedule, and current training profile.
+                                Generate a personalized week-by-week triathlon plan based on your goal race.
                             </p>
-
-                            <button className={styles.panelButton} disabled>
-                                Generate Plan
-                            </button>
+                            <a href="/plan" className={styles.panelButton}>
+                                Open Plan
+                            </a>
                         </div>
 
                         <div className={styles.panel}>
