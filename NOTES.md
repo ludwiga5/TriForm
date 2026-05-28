@@ -4,7 +4,6 @@
 
 ## To-Do
 
-- Make "Mark Complete" PlannedWorkout in /plans toggle instead of false->true only
 - Make Completed PlannedWorkouts into standard Workouts for editing/viewing purposes 
 - Fix UI for smaller Aspect ratios
 
