@@ -235,6 +235,12 @@ public class TrainingPlanService {
         if (!plannedWorkout.getUser().getId().equals(user.getId())) {
             throw new SecurityException("Forbidden");
         }    
+
+        if (plannedWorkout.getLoggedWorkout() != null) {
+            plannedWorkout.setCompleted(true);
+            plannedWorkoutRepository.save(plannedWorkout);
+            return new WorkoutResponse(plannedWorkout.getLoggedWorkout());
+        }
         
         int durationMin = request.getDurationMin() != null
             ? request.getDurationMin()
@@ -261,6 +267,7 @@ public class TrainingPlanService {
         Workout savedWorkout = workoutRepository.save(workout);
 
         plannedWorkout.setCompleted(true);
+        plannedWorkout.setLoggedWorkout(savedWorkout);
         plannedWorkoutRepository.save(plannedWorkout);
 
         return new WorkoutResponse(savedWorkout);

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.EnumType;
 
@@ -21,6 +22,10 @@ public class PlannedWorkout extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToOne
+    @JoinColumn(name = "logged_workout_id")
+    private Workout loggedWorkout;
 
     // Swim, Bike, Run
     @Column(name = "discipline", nullable = false, unique = false)
@@ -97,6 +102,9 @@ public class PlannedWorkout extends BaseEntity {
     public boolean getCompleted() {
         return completed;
     }
+    public Workout getLoggedWorkout() {
+        return loggedWorkout;
+    }
 
     // setters
     public void setTrainingPlan(TrainingPlan trainingPlan) {
@@ -142,4 +150,8 @@ public class PlannedWorkout extends BaseEntity {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    public void setLoggedWorkout(Workout loggedWorkout) {
+        this.loggedWorkout = loggedWorkout;
+    }    
 }

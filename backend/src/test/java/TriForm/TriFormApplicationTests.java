@@ -1132,6 +1132,52 @@ class TriFormApiIntegrationTest {
                 ))))
                 .andExpect(status().isUnauthorized());
         }
+        
+        @Test
+        void loggingSamePlannedWorkoutTwiceDoesNotCreateDuplicateLoggedWorkouts() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Duplicate Log Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(post("/api/plans/workouts/" + plannedWorkoutId + "/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 35,
+                        "distance", 3.4,
+                        "notes", "First log"
+                ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.workoutDurationMinutes", is(35)))
+                .andExpect(jsonPath("$.workoutDistance", is(3.4)))
+                .andExpect(jsonPath("$.workoutNotes", is("First log")));
+
+        mockMvc.perform(post("/api/plans/workouts/" + plannedWorkoutId + "/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 60,
+                        "distance", 6.0,
+                        "notes", "Second log should not create duplicate"
+                ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.workoutDurationMinutes", is(35)))
+                .andExpect(jsonPath("$.workoutDistance", is(3.4)))
+                .andExpect(jsonPath("$.workoutNotes", is("First log")));
+
+        mockMvc.perform(get("/api/workout")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(true)));
+        }
 
     private void register(String username, String email, String password) throws Exception {
         mockMvc.perform(post("/account/register")
