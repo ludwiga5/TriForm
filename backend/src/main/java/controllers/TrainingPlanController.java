@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,8 @@ public class TrainingPlanController {
         this.trainingPlanRepository = trainingPlanRepository;
         this.plannedWorkoutRepository = plannedWorkoutRepository;
     }
+
+    // Plan Endpoints
 
     @PostMapping("/plans/generate")
     public ResponseEntity<?> createTrainingPlan(
@@ -91,6 +94,19 @@ public class TrainingPlanController {
             Map.of(
                 "message", "Training Plan Successfully Deleted")
         );
+
+    }
+
+    //  Planned Workout Endpoints
+
+    @PutMapping("/plans/workouts/{id}/complete")
+    public ResponseEntity<?> completePlannedWorkout(
+        @AuthenticationPrincipal String username,
+        @PathVariable Long id)
+    {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));   
+        return ResponseEntity.ok(trainingPlanService.markPlannedWorkoutComplete(user, id));
 
     }
 

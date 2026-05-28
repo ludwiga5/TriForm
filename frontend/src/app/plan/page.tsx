@@ -5,7 +5,7 @@ import AppShell from "@/components/AppShell";
 import shellStyles from "@/components/AppShell.module.css";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthGetRequest, AuthPostRequest, DeleteRequest } from "@/lib/api-helper";
+import { AuthGetRequest, AuthPostRequest, DeleteRequest, PutRequest } from "@/lib/api-helper";
 
 type RaceType = "SPRINT" | "OLYMPIC" | "HALF_IRONMAN" | "FULL_IRONMAN";
 type PlanStatus = "ACTIVE" | "COMPLETED" | "ARCHIVED";
@@ -249,6 +249,39 @@ export default function PlanPage() {
         setDeletingId(null);
     }
 
+    async function handleCompleteWorkout(workoutId: number) {
+    setError(null);
+
+    const response = await PutRequest<PlannedWorkoutResponse>(
+        `/api/plans/workouts/${workoutId}/complete`,
+        {}
+    );
+
+    if (response.error) {
+        handleAuthError(response.error);
+        return;
+    }
+
+    if (!response.data || !selectedPlan) {
+        return;
+    }
+
+    const updatedWorkout = response.data;
+
+    const updatedWorkouts = selectedPlan.workouts.map((workout) => {
+        if (workout.id === updatedWorkout.id) {
+            return updatedWorkout;
+        }
+
+        return workout;
+    });
+
+    setSelectedPlan({
+        ...selectedPlan,
+        workouts: updatedWorkouts,
+    });
+}
+
     function handleAuthError(message: string) {
         if (message.includes("401") || message.toLowerCase().includes("unauthorized")) {
             localStorage.removeItem("token");
@@ -452,7 +485,10 @@ export default function PlanPage() {
 
                                             <div className={styles.workoutGrid}>
                                                 {workouts.map((workout) => (
-                                                    <div key={workout.id} className={styles.workoutCard}>
+                                                    <div
+                                                        key={workout.id}
+                                                        className={`${styles.workoutCard} ${workout.completed ? styles.workoutCardCompleted : ""}`}
+                                                    >
                                                         <div className={styles.workoutTop}>
                                                             <span className={styles.disciplineCode}>
                                                                 {disciplineCode(workout.discipline)}
@@ -473,6 +509,15 @@ export default function PlanPage() {
                                                         </div>
 
                                                         <p className={styles.workoutNotes}>{workout.notes}</p>
+
+                                                        <button
+                                                            className={workout.completed ? styles.completedButton : styles.completeButton}
+                                                            onClick={() => handleCompleteWorkout(workout.id)}
+                                                            disabled={workout.completed}
+                                                            type="button"
+                                                        >
+                                                            {workout.completed ? "Completed" : "Mark Complete"}
+                                                        </button>
                                                     </div>
                                                 ))}
                                             </div>
