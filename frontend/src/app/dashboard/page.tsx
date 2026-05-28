@@ -5,7 +5,7 @@ import AppShell from "@/components/AppShell";
 import shellStyles from "@/components/AppShell.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthGetRequest, PutRequest } from "@/lib/api-helper";
+import { AuthGetRequest, AuthPostRequest, PutRequest } from "@/lib/api-helper";
 
 interface UserProfile {
     id: number;
@@ -24,6 +24,12 @@ interface Workout {
     workoutDistance: number;
     workoutNotes: string;
     workoutType?: string;
+}
+
+interface LogPlannedWorkoutRequest {
+    durationMin: number;
+    distance: number;
+    notes: string;
 }
 
 type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
@@ -158,12 +164,46 @@ export default function DashboardPage() {
         setLoading(false);
     }
 
-    async function handleToggleWorkoutComplete(workoutId: number) {
+    async function handleToggleWorkoutComplete(workout: PlannedWorkoutResponse) {
         setErrorMessage(null);
 
-        const response = await PutRequest<PlannedWorkoutResponse>(
-            `/api/plans/workouts/${workoutId}/toggle-complete`,
-            {}
+        if (workout.completed) {
+            const response = await PutRequest<PlannedWorkoutResponse>(
+                `/api/plans/workouts/${workout.id}/toggle-complete`,
+                {}
+            );
+
+            if (response.error) {
+                setErrorMessage(response.error);
+                return;
+            }
+
+            if (!response.data) return;
+
+            const updatedWorkout = response.data;
+
+            setTodayWorkouts((current) =>
+                current.map((item) =>
+                    item.id === updatedWorkout.id ? updatedWorkout : item
+                )
+            );
+
+            setWeekWorkouts((current) =>
+                current.map((item) =>
+                    item.id === updatedWorkout.id ? updatedWorkout : item
+                )
+            );
+
+            return;
+        }
+
+        const response = await AuthPostRequest<Workout>(
+            `/api/plans/workouts/${workout.id}/log`,
+            {
+                durationMin: workout.targetDurationMin,
+                distance: workout.targetDistance,
+                notes: workout.notes,
+            } satisfies LogPlannedWorkoutRequest
         );
 
         if (response.error) {
@@ -171,21 +211,31 @@ export default function DashboardPage() {
             return;
         }
 
-        if (!response.data) return;
-
-        const updatedWorkout = response.data;
+        const completedWorkout = {
+            ...workout,
+            completed: true,
+        };
 
         setTodayWorkouts((current) =>
-            current.map((workout) =>
-                workout.id === updatedWorkout.id ? updatedWorkout : workout
+            current.map((item) =>
+                item.id === workout.id ? completedWorkout : item
             )
         );
 
         setWeekWorkouts((current) =>
-            current.map((workout) =>
-                workout.id === updatedWorkout.id ? updatedWorkout : workout
+            current.map((item) =>
+                item.id === workout.id ? completedWorkout : item
             )
         );
+
+        if (response.data) {
+            setRecentWorkouts((current) => {
+                const withoutDuplicate = current.filter((item) => item.id !== response.data!.id);
+                return [response.data!, ...withoutDuplicate]
+                    .sort((a, b) => new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime())
+                    .slice(0, 5);
+            });
+        }
     }
 
     if (loading) {
@@ -257,7 +307,7 @@ export default function DashboardPage() {
 
                                 <button
                                     className={workout.completed ? styles.completedButton : styles.completeButton}
-                                    onClick={() => handleToggleWorkoutComplete(workout.id)}
+                                    onClick={() => handleToggleWorkoutComplete(workout)}
                                     type="button"
                                 >
                                     {workout.completed ? "Undo Complete" : "Mark Complete"}
@@ -294,7 +344,7 @@ export default function DashboardPage() {
 
                                 <button
                                     className={workout.completed ? styles.smallCompletedButton : styles.smallCompleteButton}
-                                    onClick={() => handleToggleWorkoutComplete(workout.id)}
+                                    onClick={() => handleToggleWorkoutComplete(workout)}
                                     type="button"
                                 >
                                     {workout.completed ? "Undo" : "Done"}
