@@ -19,6 +19,11 @@
     2. weekly days
     3. max weekday hours->min
     4. max weekend hours->min
+    5. preferredRestDay
+    6. currentSwimComfort
+    7. currentBikeComfort
+    8. currentRunComfort
+    9. injuryStatus maybe later
 - Automatic missed workout detection
 - AI-assisted plan generation
 
