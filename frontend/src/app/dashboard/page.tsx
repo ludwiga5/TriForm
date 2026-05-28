@@ -5,7 +5,7 @@ import AppShell from "@/components/AppShell";
 import shellStyles from "@/components/AppShell.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthGetRequest } from "@/lib/api-helper";
+import { AuthGetRequest, PutRequest } from "@/lib/api-helper";
 
 interface UserProfile {
     id: number;
@@ -26,30 +26,79 @@ interface Workout {
     workoutType?: string;
 }
 
+type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
+
+interface PlannedWorkoutResponse {
+    id: number;
+    trainingPlanId: number;
+    discipline: string;
+    scheduledDate: string;
+    targetDurationMin: number;
+    targetDistance: number;
+    type: WorkoutType;
+    title: string;
+    notes: string;
+    weekNumber: number;
+    completed: boolean;
+}
+
 const DISCIPLINES = [
     { key: "swim", label: "Swim", code: "SW" },
     { key: "bike", label: "Bike", code: "BK" },
     { key: "run", label: "Run", code: "RN" },
 ];
 
-function distanceUnit(discipline: string, metric: boolean): string {
-    if (discipline === "Swim") return metric ? "m" : "yd";
-    return metric ? "km" : "mi";
-}
-
-function formatImperialHeight(heightCm: number): string {
-    const totalInches = Math.round(heightCm / 2.54);
+function formatImperialHeight(heightInCm: number): string {
+    const totalInches = Math.round(heightInCm / 2.54);
     const feet = Math.floor(totalInches / 12);
     const inches = totalInches % 12;
 
     return `${feet}'${inches}"`;
 }
 
+function distanceUnit(discipline: string, metric: boolean): string {
+    if (discipline === "Swim") return metric ? "m" : "yd";
+    return metric ? "km" : "mi";
+}
+
+function plannedDistanceUnit(discipline: string): string {
+    if (discipline === "Swim") return "m";
+    return "mi";
+}
+
+function disciplineCode(discipline: string): string {
+    if (discipline === "Swim") return "SW";
+    if (discipline === "Bike") return "BK";
+    if (discipline === "Run") return "RN";
+    return discipline.slice(0, 2).toUpperCase();
+}
+
+function formatDate(date: string): string {
+    const parsed = new Date(`${date}T00:00:00`);
+    return parsed.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+    });
+}
+
+function formatWeekday(date: string): string {
+    const parsed = new Date(`${date}T00:00:00`);
+    return parsed.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+    });
+}
+
 export default function DashboardPage() {
     const router = useRouter();
+
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([]);
+    const [todayWorkouts, setTodayWorkouts] = useState<PlannedWorkoutResponse[]>([]);
+    const [weekWorkouts, setWeekWorkouts] = useState<PlannedWorkoutResponse[]>([]);
     const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -59,32 +108,85 @@ export default function DashboardPage() {
             return;
         }
 
-        Promise.all([
+        loadDashboard();
+    }, [router]);
+
+    async function loadDashboard() {
+        setLoading(true);
+        setErrorMessage(null);
+
+        const [profileRes, workoutsRes, todayRes, weekRes] = await Promise.all([
             AuthGetRequest<UserProfile>("/api/profile"),
             AuthGetRequest<Workout[]>("/api/workout"),
-        ]).then(([profileRes, workoutsRes]) => {
-            if (profileRes.error) {
-                if (profileRes.error === "Profile not found") router.push("/profile");
-                else {
-                    localStorage.removeItem("token");
-                    router.push("/");
-                }
-                return;
+            AuthGetRequest<PlannedWorkoutResponse[]>("/api/plans/workouts/today"),
+            AuthGetRequest<PlannedWorkoutResponse[]>("/api/plans/workouts/week"),
+        ]);
+
+        if (profileRes.error) {
+            if (profileRes.error === "Profile not found") {
+                router.push("/profile");
+            } else {
+                localStorage.removeItem("token");
+                router.push("/");
             }
 
-            setProfile(profileRes.data ?? null);
+            return;
+        }
 
-            if (workoutsRes.data) {
-                const sorted = workoutsRes.data
-                    .sort((a, b) => new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime())
-                    .slice(0, 5);
+        setProfile(profileRes.data ?? null);
 
-                setRecentWorkouts(sorted);
-            }
+        if (workoutsRes.data) {
+            const sorted = workoutsRes.data
+                .sort((a, b) => new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime())
+                .slice(0, 5);
 
-            setLoading(false);
-        });
-    }, [router]);
+            setRecentWorkouts(sorted);
+        }
+
+        if (todayRes.data) {
+            setTodayWorkouts(todayRes.data);
+        }
+
+        if (weekRes.data) {
+            setWeekWorkouts(weekRes.data);
+        }
+
+        if (todayRes.error || weekRes.error) {
+            setErrorMessage("Training plan workouts could not be loaded.");
+        }
+
+        setLoading(false);
+    }
+
+    async function handleToggleWorkoutComplete(workoutId: number) {
+        setErrorMessage(null);
+
+        const response = await PutRequest<PlannedWorkoutResponse>(
+            `/api/plans/workouts/${workoutId}/toggle-complete`,
+            {}
+        );
+
+        if (response.error) {
+            setErrorMessage(response.error);
+            return;
+        }
+
+        if (!response.data) return;
+
+        const updatedWorkout = response.data;
+
+        setTodayWorkouts((current) =>
+            current.map((workout) =>
+                workout.id === updatedWorkout.id ? updatedWorkout : workout
+            )
+        );
+
+        setWeekWorkouts((current) =>
+            current.map((workout) =>
+                workout.id === updatedWorkout.id ? updatedWorkout : workout
+            )
+        );
+    }
 
     if (loading) {
         return (
@@ -116,6 +218,93 @@ export default function DashboardPage() {
                 )}
             </header>
 
+            {errorMessage && (
+                <div className={styles.error}>
+                    {errorMessage}
+                </div>
+            )}
+
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Today</h2>
+
+                {todayWorkouts.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        No planned workouts today.
+                    </div>
+                ) : (
+                    <div className={styles.todayWorkoutList}>
+                        {todayWorkouts.map((workout) => (
+                            <div
+                                key={workout.id}
+                                className={`${styles.todayWorkoutCard} ${workout.completed ? styles.todayWorkoutCardCompleted : ""}`}
+                            >
+                                <div className={styles.todayWorkoutTop}>
+                                    <span className={styles.todayWorkoutIcon}>
+                                        {disciplineCode(workout.discipline)}
+                                    </span>
+
+                                    <div className={styles.todayWorkoutInfo}>
+                                        <span className={styles.todayWorkoutTitle}>{workout.title}</span>
+                                        <span className={styles.todayWorkoutMeta}>
+                                            {workout.type} · {workout.targetDurationMin} min · {workout.targetDistance} {plannedDistanceUnit(workout.discipline)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {workout.notes && (
+                                    <p className={styles.todayWorkoutNotes}>{workout.notes}</p>
+                                )}
+
+                                <button
+                                    className={workout.completed ? styles.completedButton : styles.completeButton}
+                                    onClick={() => handleToggleWorkoutComplete(workout.id)}
+                                    type="button"
+                                >
+                                    {workout.completed ? "Undo Complete" : "Mark Complete"}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>This Week</h2>
+
+                {weekWorkouts.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        No planned workouts this week.
+                    </div>
+                ) : (
+                    <div className={styles.weekWorkoutList}>
+                        {weekWorkouts.map((workout) => (
+                            <div
+                                key={workout.id}
+                                className={`${styles.weekWorkoutRow} ${workout.completed ? styles.weekWorkoutRowCompleted : ""}`}
+                            >
+                                <span className={styles.weekWorkoutDate}>{formatWeekday(workout.scheduledDate)}</span>
+                                <span className={styles.weekWorkoutIcon}>{disciplineCode(workout.discipline)}</span>
+
+                                <div className={styles.weekWorkoutInfo}>
+                                    <span className={styles.weekWorkoutTitle}>{workout.title}</span>
+                                    <span className={styles.weekWorkoutMeta}>
+                                        {workout.type} · {workout.targetDurationMin} min · {workout.targetDistance} {plannedDistanceUnit(workout.discipline)}
+                                    </span>
+                                </div>
+
+                                <button
+                                    className={workout.completed ? styles.smallCompletedButton : styles.smallCompleteButton}
+                                    onClick={() => handleToggleWorkoutComplete(workout.id)}
+                                    type="button"
+                                >
+                                    {workout.completed ? "Undo" : "Done"}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
+
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Recent Sessions</h2>
 
@@ -131,7 +320,7 @@ export default function DashboardPage() {
                             return (
                                 <div key={workout.id} className={styles.recentWorkoutRow}>
                                     <span className={styles.recentWorkoutIcon}>
-                                        {workout.workoutDiscipline.slice(0, 2).toUpperCase()}
+                                        {disciplineCode(workout.workoutDiscipline)}
                                     </span>
 
                                     <div className={styles.recentWorkoutInfo}>
@@ -139,7 +328,9 @@ export default function DashboardPage() {
                                             <span className={styles.recentWorkoutTitle}>
                                                 {workout.workoutTitle || `${workout.workoutDiscipline} Session`}
                                             </span>
-                                            <span className={styles.recentWorkoutDate}>{workout.workoutDate}</span>
+                                            <span className={styles.recentWorkoutDate}>
+                                                {formatDate(workout.workoutDate)}
+                                            </span>
                                         </div>
 
                                         <div className={styles.recentWorkoutStats}>
@@ -206,7 +397,9 @@ export default function DashboardPage() {
                         <p className={styles.panelBody}>
                             Track volume trends across disciplines and see how your training load builds over time.
                         </p>
-                        <a href="/progress" className={styles.panelButton}>View Analytics</a>
+                        <button className={styles.panelButton} disabled>
+                            View Analytics
+                        </button>
                     </div>
                 </div>
             </section>

@@ -770,6 +770,186 @@ class TriFormApiIntegrationTest {
                 .andExpect(jsonPath("$.error", notNullValue()));
     }
 
+        @Test
+        void todayPlannedWorkoutsReturnsEmptyListWhenNoWorkoutToday() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        generatePlan(token, "Future Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+
+        mockMvc.perform(get("/api/plans/workouts/today")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(0)));
+        }
+
+        @Test
+        void weekPlannedWorkoutsReturnsWorkoutsInsideCurrentCalendarWeek() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        LocalDate today = LocalDate.now();
+        LocalDate raceDay = today.plusWeeks(10);
+
+        generatePlan(token, "Current Week Sprint", "SPRINT", raceDay.toString(), "Syracuse, NY");
+
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+
+        String response = mockMvc.perform(get("/api/plans/workouts/week")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode workouts = objectMapper.readTree(response);
+
+        assertTrue(workouts.size() > 0);
+
+        for (JsonNode workout : workouts) {
+                LocalDate scheduledDate = LocalDate.parse(workout.get("scheduledDate").asText());
+
+                assertTrue(
+                !scheduledDate.isBefore(startOfWeek) && !scheduledDate.isAfter(endOfWeek),
+                "Workout date should be inside the current calendar week"
+                );
+        }
+        }
+
+        @Test
+        void todayPlannedWorkoutsReturnsMultipleWorkoutsForToday() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        LocalDate today = LocalDate.now();
+        LocalDate raceDay = today.plusWeeks(10);
+
+        long planId = generatePlan(token, "Today Sprint", "SPRINT", raceDay.toString(), "Syracuse, NY");
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].scheduledDate", is(today.toString())));
+
+        mockMvc.perform(get("/api/plans/workouts/today")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].scheduledDate", is(today.toString())))
+                .andExpect(jsonPath("$[0].title", is("Easy Run")))
+                .andExpect(jsonPath("$[0].completed", is(false)));
+        }
+
+        @Test
+        void togglePlannedWorkoutCompleteMarksWorkoutCompleted() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Toggle Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(put("/api/plans/workouts/" + plannedWorkoutId + "/toggle-complete")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is((int) plannedWorkoutId)))
+                .andExpect(jsonPath("$.completed", is(true)));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(true)));
+        }
+
+        @Test
+        void togglePlannedWorkoutCompleteTwiceReturnsWorkoutToIncomplete() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Toggle Twice Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(put("/api/plans/workouts/" + plannedWorkoutId + "/toggle-complete")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.completed", is(true)));
+
+        mockMvc.perform(put("/api/plans/workouts/" + plannedWorkoutId + "/toggle-complete")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.completed", is(false)));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(false)));
+        }
+
+        @Test
+        void userCannotToggleAnotherUsersPlannedWorkout() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        register("sam", "sam@test.com", "password123");
+
+        String alexToken = login("alex", "password123");
+        String samToken = login("sam", "password123");
+
+        createProfile(alexToken, true, 180.0, 72.0, "2007-05-10");
+        createProfile(samToken, true, 170.0, 65.0, "2007-06-10");
+
+        long alexPlanId = generatePlan(alexToken, "Alex Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long alexPlannedWorkoutId = getFirstPlannedWorkoutId(alexToken, alexPlanId);
+
+        mockMvc.perform(put("/api/plans/workouts/" + alexPlannedWorkoutId + "/toggle-complete")
+                .header("Authorization", bearer(samToken))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/plans/" + alexPlanId)
+                .header("Authorization", bearer(alexToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(false)));
+        }
+
+        @Test
+        void toggleMissingPlannedWorkoutReturnsNotFound() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        mockMvc.perform(put("/api/plans/workouts/99999/toggle-complete")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error", notNullValue()));
+        }
+
+        @Test
+        void plannedWorkoutRoutesRejectMissingToken() throws Exception {
+        mockMvc.perform(get("/api/plans/workouts/today"))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api/plans/workouts/week"))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(put("/api/plans/workouts/1/toggle-complete")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isUnauthorized());
+        }
+
     private void register(String username, String email, String password) throws Exception {
         mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -904,4 +1084,20 @@ class TriFormApiIntegrationTest {
     private String bearer(String token) {
         return "Bearer " + token;
     }
+
+    private long getFirstPlannedWorkoutId(String token, long planId) throws Exception {
+    String response = mockMvc.perform(get("/api/plans/" + planId)
+            .header("Authorization", bearer(token)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.workouts.length()", greaterThan(0)))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JsonNode json = objectMapper.readTree(response);
+
+    return json.get("workouts").get(0).get("id").asLong();
+        }
+
+
 }
