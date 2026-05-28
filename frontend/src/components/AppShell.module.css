@@ -1,0 +1,262 @@
+.page {
+  --bg: #0b0c0d;
+  --bg-soft: rgba(14, 15, 17, 0.94);
+  --bg-card: rgba(22, 24, 27, 0.92);
+  --bg-card-hover: rgba(30, 33, 37, 0.96);
+
+  --accent: #992222;
+  --accent-bright: #d13a3a;
+  --accent-soft: rgba(153, 34, 34, 0.18);
+
+  --gold: #f2df7a;
+
+  --text-primary: #f1f1f1;
+  --text-secondary: #a0a0a0;
+  --text-muted: #5f6267;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --radius: 2px;
+
+  min-height: 100vh;
+  display: flex;
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 9, 10, 0.98) 0%,
+      rgba(8, 9, 10, 0.94) 36%,
+      rgba(8, 9, 10, 0.82) 64%,
+      rgba(8, 9, 10, 0.96) 100%
+    ),
+    radial-gradient(
+      circle at 80% 15%,
+      rgba(255, 255, 255, 0.08),
+      transparent 32%
+    ),
+    #0b0c0d;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 232px;
+  min-height: 100vh;
+  height: 100vh;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  padding: 28px 18px;
+
+  background: rgba(13, 14, 16, 0.98);
+  border-right: 1px solid var(--border);
+
+  transition:
+    width 0.2s ease,
+    padding 0.2s ease;
+}
+
+.sidebarCollapsed {
+  width: 78px;
+  padding: 28px 12px;
+}
+
+.sidebarLogo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 18px;
+  padding: 0 8px;
+}
+
+.sidebarCollapsed .sidebarLogo {
+  justify-content: center;
+  padding: 0;
+}
+
+.logoMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--accent);
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.logoText {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.collapseButton {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 24px;
+
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.collapseButton:hover {
+  color: var(--accent-bright);
+  border-color: rgba(209, 58, 58, 0.45);
+  background: rgba(153, 34, 34, 0.08);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  border-radius: var(--radius);
+
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  transition:
+    color 0.16s ease,
+    background 0.16s ease;
+}
+
+.sidebarCollapsed .navItem {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text-primary);
+}
+
+.navItemActive {
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+}
+
+.navItemActive:hover {
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+}
+
+.navIcon {
+  width: 24px;
+  flex-shrink: 0;
+
+  color: inherit;
+
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebarCollapsed .navIcon {
+  width: auto;
+}
+
+.logoutButton {
+  margin-top: auto;
+  padding: 10px 12px;
+
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+
+  background: transparent;
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.sidebarCollapsed .logoutButton {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.logoutButton:hover {
+  color: var(--accent-bright);
+  border-color: rgba(209, 58, 58, 0.45);
+  background: rgba(153, 34, 34, 0.08);
+}
+
+.main {
+  flex: 1;
+  max-width: 1280px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+
+  padding: 44px 56px 64px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    max-width: none;
+    padding: 28px 20px 48px;
+  }
+}

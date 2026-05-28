@@ -1,10 +1,17 @@
 "use client";
 
-import styles from "../page.module.css";
+import styles from "./register.module.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PostRequest } from "@/lib/api-helper";
-import { RegisterResponse, LoginResponse } from "@/lib/types";
+
+interface RegisterResponse {
+    message: string;
+}
+
+interface LoginResponse {
+    token: string;
+}
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -12,18 +19,40 @@ export default function RegisterPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        setLoading(true);
         setErrorMessage(null);
 
+        if (!username.trim()) {
+            setErrorMessage("Enter a username.");
+            return;
+        }
+
+        if (!email.trim()) {
+            setErrorMessage("Enter an email.");
+            return;
+        }
+
+        if (password.length < 6) {
+            setErrorMessage("Password must be at least 6 characters.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setErrorMessage("Passwords do not match.");
+            return;
+        }
+
+        setLoading(true);
+
         const registerResponse = await PostRequest<RegisterResponse>("/account/register", {
-            username,
-            email,
+            username: username.trim(),
+            email: email.trim(),
             password,
         });
 
@@ -34,19 +63,14 @@ export default function RegisterPage() {
         }
 
         const loginResponse = await PostRequest<LoginResponse>("/account/login", {
-            identifier: username,
+            identifier: username.trim(),
             password,
         });
 
-        if (loginResponse.error) {
-            setLoading(false);
-            setErrorMessage(loginResponse.error);
-            return;
-        }
+        setLoading(false);
 
-        if (!loginResponse.data) {
-            setLoading(false);
-            setErrorMessage("Account created, but login failed.");
+        if (loginResponse.error || !loginResponse.data?.token) {
+            setErrorMessage(loginResponse.error || "Account created, but login failed.");
             return;
         }
 
@@ -56,52 +80,73 @@ export default function RegisterPage() {
 
     return (
         <div className={styles.page}>
-            <main className={styles.intro}>
-                <h1>Join TriForm</h1>
+            <main className={styles.shell}>
+                <section className={styles.hero}>
+                    <p className={styles.kicker}>Start Training</p>
+                    <h1>Create Account</h1>
+                    <p className={styles.subtitle}>
+                        Build your athlete profile, log your training, and generate race-specific triathlon plans.
+                    </p>
+                </section>
 
                 <div className={styles.card}>
-                    <form onSubmit={handleSubmit} className={styles.loginForm}>
-                        <h2>Create Account</h2>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <h2>Register</h2>
 
                         {errorMessage && <div className={styles.error}>{errorMessage}</div>}
 
-                        <input
-                            className={styles.inputField}
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Username</label>
+                            <input
+                                className={styles.inputField}
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </div>
 
-                        <input
-                            className={styles.inputField}
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Email</label>
+                            <input
+                                className={styles.inputField}
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
 
-                        <input
-                            className={styles.inputField}
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Password</label>
+                            <input
+                                className={styles.inputField}
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Confirm Password</label>
+                            <input
+                                className={styles.inputField}
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                        </div>
 
                         <button className={styles.primaryButton} type="submit" disabled={loading}>
-                            {loading ? "Creating account..." : "Register"}
+                            {loading ? "Creating..." : "Create Account"}
                         </button>
-                    </form>
 
-                    <div className={styles.ctas}>
-                        <a className={styles.secondary} href="/">
-                            Back to Login
-                        </a>
-                    </div>
+                        <p className={styles.switchText}>
+                            Already have an account? <a href="/">Log in</a>
+                        </p>
+                    </form>
                 </div>
             </main>
         </div>

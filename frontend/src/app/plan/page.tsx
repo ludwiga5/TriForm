@@ -1,6 +1,8 @@
 "use client";
 
 import styles from "./plan.module.css";
+import AppShell from "@/components/AppShell";
+import shellStyles from "@/components/AppShell.module.css";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGetRequest, AuthPostRequest, DeleteRequest } from "@/lib/api-helper";
@@ -41,21 +43,6 @@ interface TrainingPlanDetailResponse extends TrainingPlanResponse {
     workouts: PlannedWorkoutResponse[];
 }
 
-interface GeneratePlanRequest {
-    raceName: string;
-    raceType: RaceType;
-    raceDay: string;
-    location: string;
-}
-
-const NAV_ITEMS = [
-    { label: "Dashboard", href: "/dashboard", active: false },
-    { label: "Training Plan", href: "/plan", active: true },
-    { label: "Log Workout", href: "/log", active: false },
-    { label: "Progress", href: "/progress", active: false },
-    { label: "Account", href: "/account", active: false },
-];
-
 const RACE_TYPES: { label: string; value: RaceType; weeks: number }[] = [
     { label: "Sprint", value: "SPRINT", weeks: 10 },
     { label: "Olympic", value: "OLYMPIC", weeks: 14 },
@@ -73,6 +60,15 @@ function formatDate(date: string): string {
         month: "short",
         day: "numeric",
         year: "numeric",
+    });
+}
+
+function formatWorkoutDate(date: string): string {
+    const parsed = new Date(`${date}T00:00:00`);
+    return parsed.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
     });
 }
 
@@ -198,14 +194,12 @@ export default function PlanPage() {
         setSubmitting(true);
         setError(null);
 
-        const body: GeneratePlanRequest = {
+        const response = await AuthPostRequest<TrainingPlanDetailResponse>("/api/plans/generate", {
             raceName: raceName.trim(),
             raceType,
             raceDay,
             location: location.trim(),
-        };
-
-        const response = await AuthPostRequest<TrainingPlanDetailResponse>("/api/plans/generate", body);
+        });
 
         if (response.error) {
             handleAuthError(response.error);
@@ -265,261 +259,231 @@ export default function PlanPage() {
         setError(message);
     }
 
-    function handleLogout() {
-        localStorage.removeItem("token");
-        router.push("/");
-    }
-
     if (loading) {
         return (
-            <div className={styles.loadingScreen}>
-                <div className={styles.loadingDot} />
-                <div className={styles.loadingDot} />
-                <div className={styles.loadingDot} />
+            <div className={shellStyles.loadingScreen}>
+                <div className={shellStyles.loadingDot} />
+                <div className={shellStyles.loadingDot} />
+                <div className={shellStyles.loadingDot} />
             </div>
         );
     }
 
     return (
-        <div className={styles.page}>
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarLogo}>
-                    <span className={styles.logoMark}>TF</span>
-                    <span className={styles.logoText}>TriForm</span>
+        <AppShell activePage="Training Plan">
+            <header className={styles.header}>
+                <div>
+                    <p className={styles.headerSub}>Build your race schedule</p>
+                    <h1 className={styles.headerTitle}>Training Plan</h1>
                 </div>
 
-                <nav className={styles.nav}>
-                    {NAV_ITEMS.map((item) => (
-                        <a
-                            key={item.label}
-                            href={item.href}
-                            className={`${styles.navItem} ${item.active ? styles.navItemActive : ""}`}
-                        >
-                            {item.label}
-                        </a>
-                    ))}
-                </nav>
-
-                <button className={styles.logoutButton} onClick={handleLogout}>
-                    Logout
-                </button>
-            </aside>
-
-            <main className={styles.main}>
-                <header className={styles.header}>
-                    <div>
-                        <p className={styles.headerSub}>Build your race schedule</p>
-                        <h1 className={styles.headerTitle}>Training Plan</h1>
-                    </div>
-
-                    {selectedPlan && (
-                        <div className={styles.raceBadge}>
-                            <span className={styles.raceBadgeLabel}>{selectedPlan.raceType.replace("_", " ")}</span>
-                            <span className={styles.raceBadgeValue}>{daysUntil(selectedPlan.raceDay)} days out</span>
-                        </div>
-                    )}
-                </header>
-
-                {error && (
-                    <div className={styles.error}>
-                        {error}
+                {selectedPlan && (
+                    <div className={styles.raceBadge}>
+                        <span className={styles.raceBadgeLabel}>{selectedPlan.raceType.replace("_", " ")}</span>
+                        <span className={styles.raceBadgeValue}>{daysUntil(selectedPlan.raceDay)} days</span>
                     </div>
                 )}
+            </header>
 
-                <div className={styles.content}>
-                    <section className={styles.formSection}>
-                        <h2 className={styles.sectionTitle}>Generate Plan</h2>
+            {error && (
+                <div className={styles.error}>
+                    {error}
+                </div>
+            )}
 
-                        <div className={styles.card}>
-                            <form className={styles.form} onSubmit={handleSubmit}>
-                                <div className={styles.fieldGroup}>
-                                    <label className={styles.fieldLabel}>Race Name</label>
-                                    <input
-                                        className={styles.inputField}
-                                        type="text"
-                                        placeholder="Lake Placid Triathlon"
-                                        value={raceName}
-                                        onChange={(e) => setRaceName(e.target.value)}
-                                        required
-                                    />
-                                </div>
+            <div className={styles.content}>
+                <section className={styles.formSection}>
+                    <h2 className={styles.sectionTitle}>Generate Plan</h2>
 
-                                <div className={styles.fieldGroup}>
-                                    <label className={styles.fieldLabel}>Race Type</label>
-                                    <select
-                                        className={styles.inputField}
-                                        value={raceType}
-                                        onChange={(e) => setRaceType(e.target.value as RaceType)}
-                                    >
-                                        {RACE_TYPES.map((type) => (
-                                            <option key={type.value} value={type.value}>
-                                                {type.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                    <div className={styles.card}>
+                        <form className={styles.form} onSubmit={handleSubmit}>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Race Name</label>
+                                <input
+                                    className={styles.inputField}
+                                    type="text"
+                                    placeholder="Lake Placid Triathlon"
+                                    value={raceName}
+                                    onChange={(e) => setRaceName(e.target.value)}
+                                    required
+                                />
+                            </div>
 
-                                <div className={styles.fieldGroup}>
-                                    <label className={styles.fieldLabel}>Race Day</label>
-                                    <input
-                                        className={styles.inputField}
-                                        type="date"
-                                        min={todayISO()}
-                                        value={raceDay}
-                                        onChange={(e) => setRaceDay(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div className={styles.fieldGroup}>
-                                    <label className={styles.fieldLabel}>Location</label>
-                                    <input
-                                        className={styles.inputField}
-                                        type="text"
-                                        placeholder="Syracuse, NY"
-                                        value={location}
-                                        onChange={(e) => setLocation(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className={styles.planHint}>
-                                    {selectedRaceType && (
-                                        <span>
-                                            This will generate a {selectedRaceType.weeks}-week plan.
-                                        </span>
-                                    )}
-                                </div>
-
-                                <button className={styles.submitButton} type="submit" disabled={submitting}>
-                                    {submitting ? "Generating..." : "Generate Plan"}
-                                </button>
-                            </form>
-                        </div>
-
-                        <h2 className={styles.sectionTitle}>Saved Plans</h2>
-
-                        <div className={styles.planList}>
-                            {plans.length === 0 && (
-                                <div className={styles.emptyState}>
-                                    No saved plans yet. Generate your first plan above.
-                                </div>
-                            )}
-
-                            {plans.map((plan) => (
-                                <button
-                                    key={plan.id}
-                                    className={`${styles.planListItem} ${selectedPlan?.id === plan.id ? styles.planListItemActive : ""}`}
-                                    onClick={() => loadPlanDetails(plan.id)}
-                                    type="button"
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Race Type</label>
+                                <select
+                                    className={styles.inputField}
+                                    value={raceType}
+                                    onChange={(e) => setRaceType(e.target.value as RaceType)}
                                 >
-                                    <span className={styles.planListTitle}>{plan.raceName}</span>
-                                    <span className={styles.planListMeta}>
-                                        {plan.raceType.replace("_", " ")} · {formatDate(plan.raceDay)}
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-                    </section>
+                                    {RACE_TYPES.map((type) => (
+                                        <option key={type.value} value={type.value}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    <section className={styles.detailSection}>
-                        {!selectedPlan && (
-                            <div className={styles.emptyDetail}>
-                                <h2>No plan selected</h2>
-                                <p>Generate a new training plan or choose one from your saved plans.</p>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Race Day</label>
+                                <input
+                                    className={styles.inputField}
+                                    type="date"
+                                    min={todayISO()}
+                                    value={raceDay}
+                                    onChange={(e) => setRaceDay(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Location</label>
+                                <input
+                                    className={styles.inputField}
+                                    type="text"
+                                    placeholder="Syracuse, NY"
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                />
+                            </div>
+
+                            <div className={styles.planHint}>
+                                {selectedRaceType && (
+                                    <span>
+                                        This will generate a {selectedRaceType.weeks}-week plan.
+                                    </span>
+                                )}
+                            </div>
+
+                            <button className={styles.submitButton} type="submit" disabled={submitting}>
+                                {submitting ? "Generating..." : "Generate Plan"}
+                            </button>
+                        </form>
+                    </div>
+
+                    <h2 className={styles.sectionTitle}>Saved Plans</h2>
+
+                    <div className={styles.planList}>
+                        {plans.length === 0 && (
+                            <div className={styles.emptyState}>
+                                No saved plans yet. Generate your first plan above.
                             </div>
                         )}
 
-                        {selectedPlan && (
-                            <>
-                                <div className={styles.planHeaderCard}>
-                                    <div>
-                                        <p className={styles.headerSub}>Current plan</p>
-                                        <h2 className={styles.planTitle}>{selectedPlan.raceName}</h2>
-                                        <p className={styles.planMeta}>
-                                            {selectedPlan.location || "No location"} · Race day {formatDate(selectedPlan.raceDay)}
-                                        </p>
-                                    </div>
+                        {plans.map((plan) => (
+                            <button
+                                key={plan.id}
+                                className={`${styles.planListItem} ${selectedPlan?.id === plan.id ? styles.planListItemActive : ""}`}
+                                onClick={() => loadPlanDetails(plan.id)}
+                                type="button"
+                            >
+                                <span className={styles.planListTitle}>{plan.raceName}</span>
+                                <span className={styles.planListMeta}>
+                                    {plan.raceType.replace("_", " ")} · {formatDate(plan.raceDay)}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </section>
 
-                                    <button
-                                        className={styles.deleteButton}
-                                        onClick={() => handleDeletePlan(selectedPlan.id)}
-                                        disabled={deletingId === selectedPlan.id}
-                                    >
-                                        {deletingId === selectedPlan.id ? "Deleting..." : "Delete Plan"}
-                                    </button>
+                <section className={styles.detailSection}>
+                    {!selectedPlan && (
+                        <div className={styles.emptyDetail}>
+                            <h2>No plan selected</h2>
+                            <p>Generate a new training plan or choose one from your saved plans.</p>
+                        </div>
+                    )}
+
+                    {selectedPlan && (
+                        <>
+                            <div className={styles.planHeaderCard}>
+                                <div>
+                                    <p className={styles.headerSub}>Current plan</p>
+                                    <h2 className={styles.planTitle}>{selectedPlan.raceName}</h2>
+                                    <p className={styles.planMeta}>
+                                        {selectedPlan.location || "No location"} · Race day {formatDate(selectedPlan.raceDay)}
+                                    </p>
                                 </div>
 
-                                <div className={styles.statGrid}>
-                                    <div className={styles.statCard}>
-                                        <span className={styles.statLabel}>Race Type</span>
-                                        <span className={styles.statValue}>{selectedPlan.raceType.replace("_", " ")}</span>
-                                    </div>
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={() => handleDeletePlan(selectedPlan.id)}
+                                    disabled={deletingId === selectedPlan.id}
+                                >
+                                    {deletingId === selectedPlan.id ? "Deleting..." : "Delete Plan"}
+                                </button>
+                            </div>
 
-                                    <div className={styles.statCard}>
-                                        <span className={styles.statLabel}>Workouts</span>
-                                        <span className={styles.statValue}>{selectedPlan.totalWorkouts}</span>
-                                    </div>
-
-                                    <div className={styles.statCard}>
-                                        <span className={styles.statLabel}>Start Date</span>
-                                        <span className={styles.statValue}>{formatDate(selectedPlan.startDate)}</span>
-                                    </div>
-
-                                    <div className={styles.statCard}>
-                                        <span className={styles.statLabel}>Race Countdown</span>
-                                        <span className={styles.statValue}>{daysUntil(selectedPlan.raceDay)} days</span>
-                                    </div>
+                            <div className={styles.statGrid}>
+                                <div className={styles.statCard}>
+                                    <span className={styles.statLabel}>Race Type</span>
+                                    <span className={styles.statValue}>{selectedPlan.raceType.replace("_", " ")}</span>
                                 </div>
 
-                                {detailsLoading ? (
-                                    <div className={styles.emptyDetail}>
-                                        <h2>Loading plan...</h2>
-                                        <p>Fetching workouts.</p>
-                                    </div>
-                                ) : (
-                                    <div className={styles.weekList}>
-                                        {Object.entries(groupedWorkouts).map(([weekNumber, workouts]) => (
-                                            <div key={weekNumber} className={styles.weekCard}>
-                                                <div className={styles.weekHeader}>
-                                                    <h3>Week {weekNumber}</h3>
-                                                    <span>{workouts.length} sessions</span>
-                                                </div>
+                                <div className={styles.statCard}>
+                                    <span className={styles.statLabel}>Workouts</span>
+                                    <span className={styles.statValue}>{selectedPlan.totalWorkouts}</span>
+                                </div>
 
-                                                <div className={styles.workoutGrid}>
-                                                    {workouts.map((workout) => (
-                                                        <div key={workout.id} className={styles.workoutCard}>
-                                                            <div className={styles.workoutTop}>
-                                                                <span className={styles.disciplineCode}>
-                                                                    {disciplineCode(workout.discipline)}
-                                                                </span>
-                                                                <span className={styles.workoutDate}>
-                                                                    {formatDate(workout.scheduledDate)}
-                                                                </span>
-                                                            </div>
+                                <div className={styles.statCard}>
+                                    <span className={styles.statLabel}>Start Date</span>
+                                    <span className={styles.statValue}>{formatDate(selectedPlan.startDate)}</span>
+                                </div>
 
-                                                            <h4 className={styles.workoutTitle}>{workout.title}</h4>
+                                <div className={styles.statCard}>
+                                    <span className={styles.statLabel}>Race Countdown</span>
+                                    <span className={styles.statValue}>{daysUntil(selectedPlan.raceDay)} days</span>
+                                </div>
+                            </div>
 
-                                                            <div className={styles.workoutStats}>
-                                                                <span>{workout.type}</span>
-                                                                <span>{workout.targetDurationMin} min</span>
-                                                                <span>
-                                                                    {workout.targetDistance} {distanceUnit(workout.discipline)}
-                                                                </span>
-                                                            </div>
-
-                                                            <p className={styles.workoutNotes}>{workout.notes}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                            {detailsLoading ? (
+                                <div className={styles.emptyDetail}>
+                                    <h2>Loading plan...</h2>
+                                    <p>Fetching workouts.</p>
+                                </div>
+                            ) : (
+                                <div className={styles.weekList}>
+                                    {Object.entries(groupedWorkouts).map(([weekNumber, workouts]) => (
+                                        <div key={weekNumber} className={styles.weekCard}>
+                                            <div className={styles.weekHeader}>
+                                                <h3>Week {weekNumber}</h3>
+                                                <span>{workouts.length} sessions</span>
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        )}
-                    </section>
-                </div>
-            </main>
-        </div>
+
+                                            <div className={styles.workoutGrid}>
+                                                {workouts.map((workout) => (
+                                                    <div key={workout.id} className={styles.workoutCard}>
+                                                        <div className={styles.workoutTop}>
+                                                            <span className={styles.disciplineCode}>
+                                                                {disciplineCode(workout.discipline)}
+                                                            </span>
+                                                            <span className={styles.workoutDate}>
+                                                                {formatWorkoutDate(workout.scheduledDate)}
+                                                            </span>
+                                                        </div>
+
+                                                        <h4 className={styles.workoutTitle}>{workout.title}</h4>
+
+                                                        <div className={styles.workoutStats}>
+                                                            <span>{workout.type}</span>
+                                                            <span>{workout.targetDurationMin} min</span>
+                                                            <span>
+                                                                {workout.targetDistance} {distanceUnit(workout.discipline)}
+                                                            </span>
+                                                        </div>
+
+                                                        <p className={styles.workoutNotes}>{workout.notes}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </section>
+            </div>
+        </AppShell>
     );
 }
