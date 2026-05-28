@@ -249,11 +249,11 @@ export default function PlanPage() {
         setDeletingId(null);
     }
 
-    async function handleCompleteWorkout(workoutId: number) {
+    async function handleToggleWorkoutComplete(workoutId: number) {
     setError(null);
 
     const response = await PutRequest<PlannedWorkoutResponse>(
-        `/api/plans/workouts/${workoutId}/complete`,
+        `/api/plans/workouts/${workoutId}/toggle-complete`,
         {}
     );
 
@@ -512,11 +512,10 @@ export default function PlanPage() {
 
                                                         <button
                                                             className={workout.completed ? styles.completedButton : styles.completeButton}
-                                                            onClick={() => handleCompleteWorkout(workout.id)}
-                                                            disabled={workout.completed}
+                                                            onClick={() => handleToggleWorkoutComplete(workout.id)}
                                                             type="button"
                                                         >
-                                                            {workout.completed ? "Completed" : "Mark Complete"}
+                                                            {workout.completed ? "Undo Complete" : "Mark Complete"}
                                                         </button>
                                                     </div>
                                                 ))}

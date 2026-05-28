@@ -266,6 +266,190 @@
   margin-left: 18px;
 }
 
+.error {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(209, 58, 58, 0.35);
+  background: rgba(153, 34, 34, 0.14);
+  color: #ffb7b7;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.todayWorkoutList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+.todayWorkoutCard {
+  min-height: 190px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg-card);
+  transition: background 0.16s ease, opacity 0.16s ease;
+}
+
+.todayWorkoutCard:hover {
+  background: var(--bg-card-hover);
+}
+
+.todayWorkoutCardCompleted {
+  opacity: 0.58;
+}
+
+.todayWorkoutTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.todayWorkoutIcon,
+.weekWorkoutIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.todayWorkoutInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.todayWorkoutTitle {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.todayWorkoutMeta {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.todayWorkoutNotes {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.completeButton,
+.completedButton,
+.smallCompleteButton,
+.smallCompletedButton {
+  border-radius: var(--radius);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.completeButton,
+.completedButton {
+  height: 36px;
+  margin-top: auto;
+}
+
+.completeButton,
+.smallCompleteButton {
+  border: 1px solid rgba(209, 58, 58, 0.45);
+  background: rgba(153, 34, 34, 0.12);
+  color: var(--accent-bright);
+}
+
+.completeButton:hover,
+.smallCompleteButton:hover {
+  background: rgba(153, 34, 34, 0.22);
+  border-color: var(--accent-bright);
+}
+
+.completedButton,
+.smallCompletedButton {
+  border: 1px solid rgba(242, 223, 122, 0.28);
+  background: rgba(242, 223, 122, 0.1);
+  color: var(--gold);
+}
+
+.weekWorkoutList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+.weekWorkoutRow {
+  display: grid;
+  grid-template-columns: 95px 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  background: var(--bg-card);
+  transition: background 0.16s ease, opacity 0.16s ease;
+}
+
+.weekWorkoutRow:hover {
+  background: var(--bg-card-hover);
+}
+
+.weekWorkoutRowCompleted {
+  opacity: 0.58;
+}
+
+.weekWorkoutDate {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.weekWorkoutInfo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weekWorkoutTitle {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.weekWorkoutMeta {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.smallCompleteButton,
+.smallCompletedButton {
+  height: 32px;
+  padding: 0 10px;
+}
+
+
 @media (max-width: 980px) {
   .panelGrid,
   .disciplineGrid {
@@ -295,4 +479,15 @@
     flex-direction: column;
     gap: 2px;
   }
+
+@media (max-width: 980px) {
+  .todayWorkoutList {
+    grid-template-columns: 1fr;
+  }
+
+  .weekWorkoutRow {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+}
 }
