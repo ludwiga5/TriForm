@@ -8,15 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dto.GeneratePlanRequest;
+import dto.LogPlannedWorkoutRequest;
 import dto.PlannedWorkoutResponse;
 import dto.TrainingPlanDetailResponse;
 import dto.TrainingPlanResponse;
+import dto.WorkoutResponse;
 import entities.PlanStatus;
 import entities.PlannedWorkout;
 import repositories.PlannedWorkoutRepository;
+import repositories.WorkoutRepository;
 import entities.RaceGoal;
 import entities.TrainingPlan;
 import entities.User;
+import entities.Workout;
 import entities.WorkoutType;
 import exceptions.TrainingPlanNotFoundException;
 import exceptions.WorkoutNotFoundException;
@@ -30,15 +34,18 @@ public class TrainingPlanService {
     private final RaceGoalRepository raceGoalRepository;
     private final TrainingPlanRepository trainingPlanRepository;
     private final PlannedWorkoutRepository plannedWorkoutRepository;
+    private final WorkoutRepository workoutRepository;
 
     public TrainingPlanService(
         RaceGoalRepository raceGoalRepository, 
         TrainingPlanRepository trainingPlanRepository,
-        PlannedWorkoutRepository plannedWorkoutRepository)
+        PlannedWorkoutRepository plannedWorkoutRepository,
+        WorkoutRepository workoutRepository)
     {
         this.raceGoalRepository = raceGoalRepository;
         this.trainingPlanRepository = trainingPlanRepository;
         this.plannedWorkoutRepository = plannedWorkoutRepository;
+        this.workoutRepository = workoutRepository;
     }
 
     public TrainingPlanDetailResponse generatePlan(User user, GeneratePlanRequest planRequest) {
@@ -215,6 +222,48 @@ public class TrainingPlanService {
         workout.setCompleted(false);
 
         plannedWorkoutRepository.save(workout);
+    }
+
+    public WorkoutResponse logPlannedWorkout(
+        User user, 
+        Long plannedWorkoutId, 
+        LogPlannedWorkoutRequest request) 
+    {
+        PlannedWorkout plannedWorkout = plannedWorkoutRepository.findById(plannedWorkoutId)
+            .orElseThrow(() -> new WorkoutNotFoundException("Planned workout not found"));
+
+        if (!plannedWorkout.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Forbidden");
+        }    
+        
+        int durationMin = request.getDurationMin() != null
+            ? request.getDurationMin()
+            : plannedWorkout.getTargetDurationMin();
+
+        Float distance = request.getDistance() != null
+            ? request.getDistance()
+            : plannedWorkout.getTargetDistance();
+
+        String notes = request.getNotes() != null && !request.getNotes().isBlank()
+            ? request.getNotes()
+            : plannedWorkout.getNotes();
+
+        Workout workout = new Workout();
+        workout.setUser(user);
+        workout.setWorkoutTitle(plannedWorkout.getTitle());
+        workout.setWorkoutDiscipline(plannedWorkout.getDiscipline());
+        workout.setWorkoutType(plannedWorkout.getType());
+        workout.setWorkoutDate(plannedWorkout.getScheduledDate());
+        workout.setWorkoutDurationMinutes(durationMin);
+        workout.setWorkoutDistance(distance);
+        workout.setWorkoutNotes(notes);
+
+        Workout savedWorkout = workoutRepository.save(workout);
+
+        plannedWorkout.setCompleted(true);
+        plannedWorkoutRepository.save(plannedWorkout);
+
+        return new WorkoutResponse(savedWorkout);
     }
 
     private int getPlanLengthWeeks(RaceType raceType) {

@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import entities.User;
 import entities.TrainingPlan;
 import dto.GeneratePlanRequest;
+import dto.LogPlannedWorkoutRequest;
 import dto.TrainingPlanDetailResponse;
+import dto.WorkoutResponse;
 import exceptions.UserNotFoundException;
 import exceptions.WorkoutNotFoundException;
 import repositories.PlannedWorkoutRepository;
@@ -99,6 +101,18 @@ public class TrainingPlanController {
     }
 
     //  Planned Workout Endpoints
+
+    @PostMapping("/plans/workouts/{id}/log")
+    public ResponseEntity<?> logPlannedWorkout(
+        @AuthenticationPrincipal String username,
+        @PathVariable Long id,
+        @RequestBody LogPlannedWorkoutRequest request
+    ) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+        WorkoutResponse response = trainingPlanService.logPlannedWorkout(user, id, request);
+        return ResponseEntity.status(201).body(response);
+    }
 
     @PutMapping("/plans/workouts/{id}/toggle-complete")
     public ResponseEntity<?> togglePlannedWorkout(
