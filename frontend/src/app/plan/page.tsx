@@ -43,6 +43,23 @@ interface TrainingPlanDetailResponse extends TrainingPlanResponse {
     workouts: PlannedWorkoutResponse[];
 }
 
+interface LogPlannedWorkoutRequest {
+    durationMin: number;
+    distance: number;
+    notes: string;
+}
+
+interface WorkoutResponse {
+    id: number;
+    workoutTitle?: string;
+    workoutDiscipline: string;
+    workoutDate: string;
+    workoutDurationMinutes: number;
+    workoutDistance: number;
+    workoutNotes: string;
+    workoutType?: string;
+}
+
 const RACE_TYPES: { label: string; value: RaceType; weeks: number }[] = [
     { label: "Sprint", value: "SPRINT", weeks: 10 },
     { label: "Olympic", value: "OLYMPIC", weeks: 14 },
@@ -249,38 +266,61 @@ export default function PlanPage() {
         setDeletingId(null);
     }
 
-    async function handleToggleWorkoutComplete(workoutId: number) {
-    setError(null);
+    async function handleToggleWorkoutComplete(workout: PlannedWorkoutResponse) {
+        setError(null);
 
-    const response = await PutRequest<PlannedWorkoutResponse>(
-        `/api/plans/workouts/${workoutId}/toggle-complete`,
-        {}
-    );
+        if (workout.completed) {
+            const response = await PutRequest<PlannedWorkoutResponse>(
+                `/api/plans/workouts/${workout.id}/toggle-complete`,
+                {}
+            );
 
-    if (response.error) {
-        handleAuthError(response.error);
-        return;
-    }
+            if (response.error) {
+                handleAuthError(response.error);
+                return;
+            }
 
-    if (!response.data || !selectedPlan) {
-        return;
-    }
+            if (!response.data || !selectedPlan) {
+                return;
+            }
 
-    const updatedWorkout = response.data;
+            const updatedWorkout = response.data;
 
-    const updatedWorkouts = selectedPlan.workouts.map((workout) => {
-        if (workout.id === updatedWorkout.id) {
-            return updatedWorkout;
+            setSelectedPlan({
+                ...selectedPlan,
+                workouts: selectedPlan.workouts.map((item) =>
+                    item.id === updatedWorkout.id ? updatedWorkout : item
+                ),
+            });
+
+            return;
         }
 
-        return workout;
-    });
+        const response = await AuthPostRequest<WorkoutResponse>(
+            `/api/plans/workouts/${workout.id}/log`,
+            {
+                durationMin: workout.targetDurationMin,
+                distance: workout.targetDistance,
+                notes: workout.notes,
+            } satisfies LogPlannedWorkoutRequest
+        );
 
-    setSelectedPlan({
-        ...selectedPlan,
-        workouts: updatedWorkouts,
-    });
-}
+        if (response.error) {
+            handleAuthError(response.error);
+            return;
+        }
+
+        if (!selectedPlan) {
+            return;
+        }
+
+        setSelectedPlan({
+            ...selectedPlan,
+            workouts: selectedPlan.workouts.map((item) =>
+                item.id === workout.id ? { ...item, completed: true } : item
+            ),
+        });
+    }
 
     function handleAuthError(message: string) {
         if (message.includes("401") || message.toLowerCase().includes("unauthorized")) {
@@ -512,7 +552,7 @@ export default function PlanPage() {
 
                                                         <button
                                                             className={workout.completed ? styles.completedButton : styles.completeButton}
-                                                            onClick={() => handleToggleWorkoutComplete(workout.id)}
+                                                            onClick={() => handleToggleWorkoutComplete(workout)}
                                                             type="button"
                                                         >
                                                             {workout.completed ? "Undo Complete" : "Mark Complete"}

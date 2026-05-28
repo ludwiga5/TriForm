@@ -949,6 +949,189 @@ class TriFormApiIntegrationTest {
                 .content("{}"))
                 .andExpect(status().isUnauthorized());
         }
+        
+        @Test
+        void logPlannedWorkoutCreatesWorkoutMarksPlannedWorkoutCompletedAndAppearsInWorkoutLog() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Log Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(post("/api/plans/workouts/" + plannedWorkoutId + "/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 35,
+                        "distance", 3.4,
+                        "notes", "Logged from planned workout"
+                ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.workoutTitle", is("Easy Run")))
+                .andExpect(jsonPath("$.workoutDiscipline", is("Run")))
+                .andExpect(jsonPath("$.workoutType", is("EASY")))
+                .andExpect(jsonPath("$.workoutDate", is("2027-07-12")))
+                .andExpect(jsonPath("$.workoutDurationMinutes", is(35)))
+                .andExpect(jsonPath("$.workoutDistance", is(3.4)))
+                .andExpect(jsonPath("$.workoutNotes", is("Logged from planned workout")));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(true)));
+
+        mockMvc.perform(get("/api/workout")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].workoutTitle", is("Easy Run")))
+                .andExpect(jsonPath("$[0].workoutDiscipline", is("Run")))
+                .andExpect(jsonPath("$[0].workoutType", is("EASY")))
+                .andExpect(jsonPath("$[0].workoutDate", is("2027-07-12")))
+                .andExpect(jsonPath("$[0].workoutDurationMinutes", is(35)))
+                .andExpect(jsonPath("$[0].workoutDistance", is(3.4)))
+                .andExpect(jsonPath("$[0].workoutNotes", is("Logged from planned workout")));
+        }
+
+        @Test
+        void logPlannedWorkoutUsesPlannedValuesWhenRequestFieldsAreMissing() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Default Log Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(post("/api/plans/workouts/" + plannedWorkoutId + "/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.workoutTitle", is("Easy Run")))
+                .andExpect(jsonPath("$.workoutDiscipline", is("Run")))
+                .andExpect(jsonPath("$.workoutType", is("EASY")))
+                .andExpect(jsonPath("$.workoutDate", is("2027-07-12")))
+                .andExpect(jsonPath("$.workoutDurationMinutes", is(30)))
+                .andExpect(jsonPath("$.workoutDistance", is(3.0)))
+                .andExpect(jsonPath("$.workoutNotes", notNullValue()));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(true)));
+
+        mockMvc.perform(get("/api/workout")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].workoutTitle", is("Easy Run")))
+                .andExpect(jsonPath("$[0].workoutDurationMinutes", is(30)))
+                .andExpect(jsonPath("$[0].workoutDistance", is(3.0)));
+        }
+
+        @Test
+        void logPlannedWorkoutCanOverrideDurationDistanceAndNotes() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        long planId = generatePlan(token, "Override Log Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long plannedWorkoutId = getFirstPlannedWorkoutId(token, planId);
+
+        mockMvc.perform(post("/api/plans/workouts/" + plannedWorkoutId + "/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 42,
+                        "distance", 4.25,
+                        "notes", "Actual workout was longer than planned"
+                ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.workoutTitle", is("Easy Run")))
+                .andExpect(jsonPath("$.workoutDurationMinutes", is(42)))
+                .andExpect(jsonPath("$.workoutDistance", is(4.25)))
+                .andExpect(jsonPath("$.workoutNotes", is("Actual workout was longer than planned")));
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(true)));
+
+        mockMvc.perform(get("/api/workout")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].workoutDurationMinutes", is(42)))
+                .andExpect(jsonPath("$[0].workoutDistance", is(4.25)))
+                .andExpect(jsonPath("$[0].workoutNotes", is("Actual workout was longer than planned")));
+        }
+
+        @Test
+        void userCannotLogAnotherUsersPlannedWorkout() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        register("sam", "sam@test.com", "password123");
+
+        String alexToken = login("alex", "password123");
+        String samToken = login("sam", "password123");
+
+        createProfile(alexToken, true, 180.0, 72.0, "2007-05-10");
+        createProfile(samToken, true, 170.0, 65.0, "2007-06-10");
+
+        long alexPlanId = generatePlan(alexToken, "Alex Log Sprint", "SPRINT", "2027-09-20", "Syracuse, NY");
+        long alexPlannedWorkoutId = getFirstPlannedWorkoutId(alexToken, alexPlanId);
+
+        mockMvc.perform(post("/api/plans/workouts/" + alexPlannedWorkoutId + "/log")
+                .header("Authorization", bearer(samToken))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 30,
+                        "distance", 3.0,
+                        "notes", "Should not work"
+                ))))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/plans/" + alexPlanId)
+                .header("Authorization", bearer(alexToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.workouts[0].completed", is(false)));
+
+        mockMvc.perform(get("/api/workout")
+                .header("Authorization", bearer(samToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(0)));
+        }
+
+        @Test
+        void logMissingPlannedWorkoutReturnsNotFound() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        mockMvc.perform(post("/api/plans/workouts/99999/log")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 30,
+                        "distance", 3.0,
+                        "notes", "Missing workout"
+                ))))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error", notNullValue()));
+        }
+
+        @Test
+        void logPlannedWorkoutRejectsMissingToken() throws Exception {
+        mockMvc.perform(post("/api/plans/workouts/1/log")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of(
+                        "durationMin", 30,
+                        "distance", 3.0,
+                        "notes", "No token"
+                ))))
+                .andExpect(status().isUnauthorized());
+        }
 
     private void register(String username, String email, String password) throws Exception {
         mockMvc.perform(post("/account/register")
