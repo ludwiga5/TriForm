@@ -4,7 +4,6 @@
   --accent: #992222;
   --accent-bright: #d13a3a;
   --accent-soft: rgba(153, 34, 34, 0.18);
-  --gold: #f2df7a;
   --text-primary: #f1f1f1;
   --text-secondary: #a0a0a0;
   --text-muted: #5f6267;
@@ -37,7 +36,7 @@
   margin: 0 auto;
   padding: 56px 0;
   display: grid;
-  grid-template-columns: 1fr 430px;
+  grid-template-columns: 1fr 420px;
   gap: 56px;
   align-items: center;
 }
@@ -79,13 +78,13 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
 }
 
-.profileForm {
+.form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.profileForm h2 {
+.form h2 {
   color: var(--text-primary);
   font-size: 28px;
   font-weight: 800;
@@ -102,51 +101,18 @@
   font-weight: 600;
 }
 
-.toggleGroup,
 .fieldGroup {
   display: flex;
   flex-direction: column;
   gap: 7px;
 }
 
-.toggleLabel,
 .fieldLabel {
   color: var(--text-secondary);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  border: 1px solid var(--border);
-  background: var(--border);
-}
-
-.toggleOption {
-  height: 42px;
-  border: none;
-  background: rgba(8, 9, 10, 0.72);
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.toggleActive {
-  background: var(--accent-soft);
-  color: var(--accent-bright);
-}
-
-.heightGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
 }
 
 .inputField {
@@ -160,7 +126,6 @@
   font-size: 13px;
   font-weight: 600;
   outline: none;
-  color-scheme: dark;
 }
 
 .inputField:focus {
@@ -192,6 +157,22 @@
   cursor: not-allowed;
 }
 
+.switchText {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.switchText a {
+  color: var(--accent-bright);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.switchText a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
@@ -200,11 +181,5 @@
 
   .hero h1 {
     font-size: 52px;
-  }
-}
-
-@media (max-width: 560px) {
-  .heightGrid {
-    grid-template-columns: 1fr;
   }
 }

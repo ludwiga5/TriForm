@@ -33,11 +33,14 @@ export default function ProfileSetupPage() {
         setCheckingAuth(false);
     }, [router]);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setErrorMessage(null);
 
-        const heightInCm = metric ? parseFloat(height) : (parseInt(feet) * 12 + parseInt(inches)) * 2.54;
+        const heightInCm = metric
+            ? parseFloat(height)
+            : (parseInt(feet) * 12 + parseInt(inches)) * 2.54;
+
         const weightValue = parseFloat(weight);
 
         if (Number.isNaN(heightInCm) || heightInCm <= 0) {
@@ -71,9 +74,7 @@ export default function ProfileSetupPage() {
             return;
         }
 
-        if (response.data) {
-            router.push("/dashboard");
-        }
+        router.push("/dashboard");
     }
 
     if (checkingAuth) {
@@ -86,7 +87,9 @@ export default function ProfileSetupPage() {
                 <section className={styles.hero}>
                     <p className={styles.kicker}>Athlete Profile</p>
                     <h1>Set Up Profile</h1>
-                    <p className={styles.subtitle}>Tell us about yourself so TriForm can build better training tools around your stats.</p>
+                    <p className={styles.subtitle}>
+                        Tell us about yourself so TriForm can build better training tools around your stats.
+                    </p>
                 </section>
 
                 <div className={styles.card}>
