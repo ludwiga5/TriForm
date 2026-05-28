@@ -19,6 +19,7 @@ import entities.TrainingPlan;
 import entities.User;
 import entities.WorkoutType;
 import exceptions.TrainingPlanNotFoundException;
+import exceptions.WorkoutNotFoundException;
 import repositories.RaceGoalRepository;
 import repositories.TrainingPlanRepository;
 import entities.RaceType;
@@ -306,6 +307,19 @@ public class TrainingPlanService {
         return buildTrainingPlanDetailResponse(plan, workouts);
     }
 
+    public PlannedWorkoutResponse markPlannedWorkoutComplete(User user, Long plannedWorkoutId) {
+        PlannedWorkout plannedWorkout = plannedWorkoutRepository.findById(plannedWorkoutId)
+            .orElseThrow(() -> new WorkoutNotFoundException("Planned workout not found"));
+
+        if (!plannedWorkout.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Forbidden");
+        }
+
+        plannedWorkout.setCompleted(true);
+        PlannedWorkout savedWorkout = plannedWorkoutRepository.save(plannedWorkout);
+        
+        return new PlannedWorkoutResponse(savedWorkout);
+    }
 }
 
 
