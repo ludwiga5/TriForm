@@ -7,7 +7,7 @@
 - DONE-Make "Mark Complete" PlannedWorkout in /plans toggle instead of false->true only
 - DONE-Make Completed PlannedWorkouts into standard Workouts for editing/viewing purposes 
 - Fix UI for smaller Aspect ratios
-- Prevent duplicate logs from the same planned workout
+- DONE-Prevent duplicate logs from the same planned workout
 - Build Progress (Althete Analytics)
 - Add PlanWorkoutStatus = {PLANNED, COMPLETED, SKIPPED, MISSED, LOGGED}
 - Add a clearer completed/logged state
@@ -37,3 +37,4 @@
 ### 5/28/2026
 
 - I should keep auth and notFoundExceptions in the Services rather than within controllers
+- You can make global frontend attributes using components. I did this with the banner and the basic app CSS
