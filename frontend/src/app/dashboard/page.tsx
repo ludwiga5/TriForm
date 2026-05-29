@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGetRequest, AuthPostRequest, PutRequest } from "@/lib/api-helper";
 
+type PlannedWorkoutStatus = "completed" | "missed" | "upcoming";
+type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
+
 interface UserProfile {
     id: number;
     metric: boolean;
@@ -32,7 +35,6 @@ interface LogPlannedWorkoutRequest {
     notes: string;
 }
 
-type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
 
 interface PlannedWorkoutResponse {
     id: number;
@@ -46,6 +48,24 @@ interface PlannedWorkoutResponse {
     notes: string;
     weekNumber: number;
     completed: boolean;
+}
+
+function getPlannedWorkoutStatus(workout: PlannedWorkoutResponse): PlannedWorkoutStatus {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const scheduledDate = new Date(`${workout.scheduledDate}T00:00:00`);
+
+    if (workout.completed) return "completed";
+    if (scheduledDate < today) return "missed";
+
+    return "upcoming";
+}
+
+function formatPlannedWorkoutStatus(status: PlannedWorkoutStatus): string {
+    if (status === "completed") return "Completed";
+    if (status === "missed") return "Missed";
+    return "Upcoming";
 }
 
 const DISCIPLINES = [
@@ -238,6 +258,14 @@ export default function DashboardPage() {
         }
     }
 
+    const missedWeekWorkouts = weekWorkouts.filter(
+        (workout) => getPlannedWorkoutStatus(workout) === "missed"
+    );
+
+    const completedWeekWorkouts = weekWorkouts.filter(
+        (workout) => getPlannedWorkoutStatus(workout) === "completed"
+    );
+
     if (loading) {
         return (
             <div className={shellStyles.loadingScreen}>
@@ -273,6 +301,26 @@ export default function DashboardPage() {
                     {errorMessage}
                 </div>
             )}
+            
+            <section className={styles.weekSnapshotGrid}>
+                <div className={styles.weekSnapshotCard}>
+                    <span className={styles.weekSnapshotLabel}>This Week</span>
+                    <span className={styles.weekSnapshotValue}>
+                        {completedWeekWorkouts.length}/{weekWorkouts.length}
+                    </span>
+                    <span className={styles.weekSnapshotMeta}>planned completed</span>
+                </div>
+
+                <div className={styles.weekSnapshotCard}>
+                    <span className={styles.weekSnapshotLabel}>Missed</span>
+                    <span className={styles.weekSnapshotValue}>
+                        {missedWeekWorkouts.length}
+                    </span>
+                    <span className={styles.weekSnapshotMeta}>
+                        workout{missedWeekWorkouts.length === 1 ? "" : "s"} this week
+                    </span>
+                </div>
+            </section>
 
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Today</h2>
@@ -286,7 +334,11 @@ export default function DashboardPage() {
                         {todayWorkouts.map((workout) => (
                             <div
                                 key={workout.id}
-                                className={`${styles.todayWorkoutCard} ${workout.completed ? styles.todayWorkoutCardCompleted : ""}`}
+                                className={`${styles.todayWorkoutCard} ${
+                                    getPlannedWorkoutStatus(workout) === "completed" ? styles.todayWorkoutCardCompleted : ""
+                                } ${
+                                    getPlannedWorkoutStatus(workout) === "missed" ? styles.todayWorkoutCardMissed : ""
+                                }`}
                             >
                                 <div className={styles.todayWorkoutTop}>
                                     <span className={styles.todayWorkoutIcon}>
@@ -330,7 +382,11 @@ export default function DashboardPage() {
                         {weekWorkouts.map((workout) => (
                             <div
                                 key={workout.id}
-                                className={`${styles.weekWorkoutRow} ${workout.completed ? styles.weekWorkoutRowCompleted : ""}`}
+                                className={`${styles.weekWorkoutRow} ${
+                                    getPlannedWorkoutStatus(workout) === "completed" ? styles.weekWorkoutRowCompleted : ""
+                                } ${
+                                    getPlannedWorkoutStatus(workout) === "missed" ? styles.weekWorkoutRowMissed : ""
+                                }`}
                             >
                                 <span className={styles.weekWorkoutDate}>{formatWeekday(workout.scheduledDate)}</span>
                                 <span className={styles.weekWorkoutIcon}>{disciplineCode(workout.discipline)}</span>

@@ -7,6 +7,43 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGetRequest } from "@/lib/api-helper";
 
+type RaceType = "SPRINT" | "OLYMPIC" | "HALF_IRONMAN" | "FULL_IRONMAN";
+type PlanStatus = "ACTIVE" | "COMPLETED" | "ARCHIVED";
+type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
+type PlannedWorkoutStatus = "completed" | "missed" | "upcoming";
+
+interface TrainingPlanResponse {
+    id: number;
+    raceGoalId: number;
+    raceName: string;
+    raceType: RaceType;
+    raceDay: string;
+    location: string;
+    status: PlanStatus;
+    startDate: string;
+    endDate: string;
+    createdDate: string;
+    totalWorkouts: number;
+}
+
+interface PlannedWorkoutResponse {
+    id: number;
+    trainingPlanId: number;
+    discipline: string;
+    scheduledDate: string;
+    targetDurationMin: number;
+    targetDistance: number;
+    type: WorkoutType;
+    title: string;
+    notes: string;
+    weekNumber: number;
+    completed: boolean;
+}
+
+interface TrainingPlanDetailResponse extends TrainingPlanResponse {
+    workouts: PlannedWorkoutResponse[];
+}
+
 interface UserProfile {
     id: number;
     metric: boolean;
@@ -34,6 +71,38 @@ interface WeekSummary {
     swimDistance: number;
     bikeDistance: number;
     runDistance: number;
+}
+
+interface PlannedWorkoutResponse {
+    id: number;
+    trainingPlanId: number;
+    discipline: string;
+    scheduledDate: string;
+    targetDurationMin: number;
+    targetDistance: number;
+    type: WorkoutType;
+    title: string;
+    notes: string;
+    weekNumber: number;
+    completed: boolean;
+}
+
+function getPlannedWorkoutStatus(workout: PlannedWorkoutResponse): PlannedWorkoutStatus {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const scheduledDate = new Date(`${workout.scheduledDate}T00:00:00`);
+
+    if (workout.completed) return "completed";
+    if (scheduledDate < today) return "missed";
+
+    return "upcoming";
+}
+
+function formatPlannedWorkoutStatus(status: PlannedWorkoutStatus): string {
+    if (status === "completed") return "Completed";
+    if (status === "missed") return "Missed";
+    return "Upcoming";
 }
 
 const DISCIPLINES = ["Swim", "Bike", "Run"];
@@ -112,6 +181,7 @@ export default function ProgressPage() {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [plannedWorkouts, setPlannedWorkouts] = useState<PlannedWorkoutResponse[]>([]);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -128,9 +198,10 @@ export default function ProgressPage() {
         setLoading(true);
         setErrorMessage(null);
 
-        const [profileRes, workoutsRes] = await Promise.all([
+        const [profileRes, workoutsRes, plansRes] = await Promise.all([
             AuthGetRequest<UserProfile>("/api/profile"),
             AuthGetRequest<Workout[]>("/api/workout"),
+            AuthGetRequest<TrainingPlanResponse[]>("/api/plans"),
         ]);
 
         if (profileRes.error) {
@@ -152,6 +223,27 @@ export default function ProgressPage() {
 
         setProfile(profileRes.data ?? null);
         setWorkouts(workoutsRes.data ?? []);
+
+        if (plansRes.data && plansRes.data.length > 0) {
+            const planDetailResponses = await Promise.all(
+                plansRes.data.map((plan) =>
+                    AuthGetRequest<TrainingPlanDetailResponse>(`/api/plans/${plan.id}`)
+                )
+            );
+
+            const allPlannedWorkouts = planDetailResponses.flatMap(
+                (response) => response.data?.workouts ?? []
+            );
+
+            setPlannedWorkouts(allPlannedWorkouts);
+        } else {
+            setPlannedWorkouts([]);
+        }
+
+        if (plansRes.error) {
+            setErrorMessage("Planned workout progress could not be loaded.");
+        }
+
         setLoading(false);
     }
 
@@ -247,6 +339,32 @@ export default function ProgressPage() {
         return Math.max(...weeklySummaries.map((week) => week.totalMinutes), 1);
     }, [weeklySummaries]);
 
+    const completedPlannedWorkouts = useMemo(() => {
+        return plannedWorkouts.filter(
+            (workout) => getPlannedWorkoutStatus(workout) === "completed"
+        );
+    }, [plannedWorkouts]);
+
+    const missedPlannedWorkouts = useMemo(() => {
+        return plannedWorkouts.filter(
+            (workout) => getPlannedWorkoutStatus(workout) === "missed"
+        );
+    }, [plannedWorkouts]);
+
+    const upcomingPlannedWorkouts = useMemo(() => {
+        return plannedWorkouts.filter(
+            (workout) => getPlannedWorkoutStatus(workout) === "upcoming"
+        );
+    }, [plannedWorkouts]);
+
+    const completionRate = useMemo(() => {
+        const decidedWorkouts = completedPlannedWorkouts.length + missedPlannedWorkouts.length;
+
+        if (decidedWorkouts === 0) return 0;
+
+        return Math.round((completedPlannedWorkouts.length / decidedWorkouts) * 100);
+    }, [completedPlannedWorkouts, missedPlannedWorkouts]);
+
     if (loading) {
         return (
             <div className={shellStyles.loadingScreen}>
@@ -315,6 +433,41 @@ export default function ProgressPage() {
                             <span className={styles.summaryMeta}>
                                 {previousWeekWorkouts.length} workout{previousWeekWorkouts.length === 1 ? "" : "s"}
                             </span>
+                        </div>
+                    </section>
+
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <div>
+                                <p className={styles.sectionKicker}>Plan adherence</p>
+                                <h2 className={styles.sectionTitle}>Planned vs Completed</h2>
+                            </div>
+                        </div>
+
+                        <div className={styles.planStatsGrid}>
+                            <div className={styles.planStatCard}>
+                                <span className={styles.planStatLabel}>Completion Rate</span>
+                                <span className={styles.planStatValue}>{completionRate}%</span>
+                                <span className={styles.planStatMeta}>completed vs missed</span>
+                            </div>
+
+                            <div className={styles.planStatCard}>
+                                <span className={styles.planStatLabel}>Completed</span>
+                                <span className={styles.planStatValue}>{completedPlannedWorkouts.length}</span>
+                                <span className={styles.planStatMeta}>planned workouts</span>
+                            </div>
+
+                            <div className={styles.planStatCard}>
+                                <span className={styles.planStatLabel}>Missed</span>
+                                <span className={styles.planStatValue}>{missedPlannedWorkouts.length}</span>
+                                <span className={styles.planStatMeta}>past incomplete workouts</span>
+                            </div>
+
+                            <div className={styles.planStatCard}>
+                                <span className={styles.planStatLabel}>Upcoming</span>
+                                <span className={styles.planStatValue}>{upcomingPlannedWorkouts.length}</span>
+                                <span className={styles.planStatMeta}>future planned workouts</span>
+                            </div>
                         </div>
                     </section>
 
