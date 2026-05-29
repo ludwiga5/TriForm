@@ -158,6 +158,18 @@
   cursor: not-allowed;
 }
 
+.inlineGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .inlineGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 700px) {
   .twoColumn {
     grid-template-columns: 1fr;
