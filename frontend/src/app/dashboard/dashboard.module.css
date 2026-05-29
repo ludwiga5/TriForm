@@ -449,6 +449,56 @@
   padding: 0 10px;
 }
 
+.weekSnapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+  margin-bottom: 28px;
+}
+
+.weekSnapshotCard {
+  min-height: 118px;
+  padding: 18px;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.weekSnapshotLabel {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.weekSnapshotValue {
+  color: var(--text-primary);
+  font-size: 34px;
+  font-weight: 850;
+  letter-spacing: -0.07em;
+}
+
+.weekSnapshotMeta {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.todayWorkoutCardMissed,
+.weekWorkoutRowMissed {
+  background: rgba(153, 34, 34, 0.08);
+}
+
+@media (max-width: 760px) {
+  .weekSnapshotGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 @media (max-width: 980px) {
   .panelGrid,

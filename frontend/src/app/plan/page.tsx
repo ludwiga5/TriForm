@@ -10,6 +10,7 @@ import { AuthGetRequest, AuthPostRequest, DeleteRequest, PutRequest } from "@/li
 type RaceType = "SPRINT" | "OLYMPIC" | "HALF_IRONMAN" | "FULL_IRONMAN";
 type PlanStatus = "ACTIVE" | "COMPLETED" | "ARCHIVED";
 type WorkoutType = "EASY" | "TEMPO" | "INTERVALS" | "LONG" | "RECOVERY" | "RACE";
+type PlannedWorkoutStatus = "completed" | "missed" | "upcoming";
 
 interface TrainingPlanResponse {
     id: number;
@@ -58,6 +59,24 @@ interface WorkoutResponse {
     workoutDistance: number;
     workoutNotes: string;
     workoutType?: string;
+}
+
+function getPlannedWorkoutStatus(workout: PlannedWorkoutResponse): PlannedWorkoutStatus {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const scheduledDate = new Date(`${workout.scheduledDate}T00:00:00`);
+
+    if (workout.completed) return "completed";
+    if (scheduledDate < today) return "missed";
+
+    return "upcoming";
+}
+
+function formatPlannedWorkoutStatus(status: PlannedWorkoutStatus): string {
+    if (status === "completed") return "Completed";
+    if (status === "missed") return "Missed";
+    return "Upcoming";
 }
 
 const RACE_TYPES: { label: string; value: RaceType; weeks: number }[] = [
@@ -524,41 +543,56 @@ export default function PlanPage() {
                                             </div>
 
                                             <div className={styles.workoutGrid}>
-                                                {workouts.map((workout) => (
-                                                    <div
-                                                        key={workout.id}
-                                                        className={`${styles.workoutCard} ${workout.completed ? styles.workoutCardCompleted : ""}`}
-                                                    >
-                                                        <div className={styles.workoutTop}>
-                                                            <span className={styles.disciplineCode}>
-                                                                {disciplineCode(workout.discipline)}
-                                                            </span>
-                                                            <span className={styles.workoutDate}>
-                                                                {formatWorkoutDate(workout.scheduledDate)}
-                                                            </span>
-                                                        </div>
+                                                {workouts.map((workout) => {
+                                                    const status = getPlannedWorkoutStatus(workout);
 
-                                                        <h4 className={styles.workoutTitle}>{workout.title}</h4>
-
-                                                        <div className={styles.workoutStats}>
-                                                            <span>{workout.type}</span>
-                                                            <span>{workout.targetDurationMin} min</span>
-                                                            <span>
-                                                                {workout.targetDistance} {distanceUnit(workout.discipline)}
-                                                            </span>
-                                                        </div>
-
-                                                        <p className={styles.workoutNotes}>{workout.notes}</p>
-
-                                                        <button
-                                                            className={workout.completed ? styles.completedButton : styles.completeButton}
-                                                            onClick={() => handleToggleWorkoutComplete(workout)}
-                                                            type="button"
+                                                    return (
+                                                        <div
+                                                            key={workout.id}
+                                                            className={`${styles.workoutCard} ${
+                                                                status === "completed" ? styles.workoutCardCompleted : ""
+                                                            } ${
+                                                                status === "missed" ? styles.workoutCardMissed : ""
+                                                            }`}
                                                         >
-                                                            {workout.completed ? "Undo Complete" : "Mark Complete"}
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                                            <div className={styles.workoutTop}>
+                                                                <span className={styles.disciplineCode}>
+                                                                    {disciplineCode(workout.discipline)}
+                                                                </span>
+
+                                                                <span className={styles.workoutDate}>
+                                                                    {formatWorkoutDate(workout.scheduledDate)}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className={styles.workoutTitleRow}>
+                                                                <h4 className={styles.workoutTitle}>{workout.title}</h4>
+
+                                                                <span className={`${styles.statusBadge} ${styles[status]}`}>
+                                                                    {formatPlannedWorkoutStatus(status)}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className={styles.workoutStats}>
+                                                                <span>{workout.type}</span>
+                                                                <span>{workout.targetDurationMin} min</span>
+                                                                <span>
+                                                                    {workout.targetDistance} {distanceUnit(workout.discipline)}
+                                                                </span>
+                                                            </div>
+
+                                                            <p className={styles.workoutNotes}>{workout.notes}</p>
+
+                                                            <button
+                                                                className={workout.completed ? styles.completedButton : styles.completeButton}
+                                                                onClick={() => handleToggleWorkoutComplete(workout)}
+                                                                type="button"
+                                                            >
+                                                                {workout.completed ? "Undo Complete" : "Mark Complete"}
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     ))}
