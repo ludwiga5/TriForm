@@ -1,0 +1,429 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.headerSub {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.headerTitle {
+  margin-top: 6px;
+  color: var(--text-primary);
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 850;
+  letter-spacing: -0.08em;
+  line-height: 0.95;
+}
+
+.headerBadge {
+  min-width: 150px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.headerBadgeLabel {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.headerBadgeValue {
+  color: var(--gold);
+  font-size: 32px;
+  font-weight: 850;
+  letter-spacing: -0.06em;
+}
+
+.error {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(209, 58, 58, 0.35);
+  background: rgba(153, 34, 34, 0.14);
+  color: #ffb7b7;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.emptyPanel {
+  min-height: 420px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 40px;
+}
+
+.emptyIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.emptyTitle {
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.emptyText {
+  max-width: 480px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.emptyButton {
+  margin-top: 8px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(209, 58, 58, 0.45);
+  background: rgba(153, 34, 34, 0.14);
+  color: var(--accent-bright);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.emptyButton:hover {
+  background: rgba(153, 34, 34, 0.24);
+  border-color: var(--accent-bright);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+  margin-bottom: 28px;
+}
+
+.summaryCard {
+  min-height: 142px;
+  padding: 20px;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.summaryLabel {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  color: var(--text-primary);
+  font-size: 36px;
+  font-weight: 850;
+  letter-spacing: -0.07em;
+}
+
+.summaryMeta {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.sectionKicker {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  margin-top: 4px;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.sectionLink {
+  color: var(--accent-bright);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.sectionLink:hover {
+  color: var(--gold);
+}
+
+.disciplineGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+.disciplineCard {
+  min-height: 180px;
+  padding: 20px;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.disciplineTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.disciplineIcon,
+.recentIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.disciplineName {
+  display: block;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.disciplineCount {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.disciplineStats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.statValue {
+  display: block;
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.06em;
+}
+
+.statLabel {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.volumeList {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.volumeRow {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+
+.volumeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.volumeDate {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.volumeStats {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.volumeTrack {
+  height: 34px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.045);
+  overflow: hidden;
+}
+
+.volumeBar {
+  height: 100%;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, rgba(153, 34, 34, 0.8), rgba(209, 58, 58, 0.9));
+}
+
+.recentList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+.recentRow {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: background 0.16s ease;
+}
+
+.recentRow:hover {
+  background: var(--bg-card-hover);
+}
+
+.recentInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.recentTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.recentTitle {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.recentDate {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.recentMeta {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+@media (max-width: 1100px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .disciplineGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .headerBadge {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .volumeRow {
+    grid-template-columns: 1fr;
+  }
+
+  .recentTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
