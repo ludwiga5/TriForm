@@ -7,6 +7,29 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGetRequest, PutRequest } from "@/lib/api-helper";
 
+type ExperienceLevel = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+type PreferredRestDay =
+    | "MONDAY"
+    | "TUESDAY"
+    | "WEDNESDAY"
+    | "THURSDAY"
+    | "FRIDAY"
+    | "SATURDAY"
+    | "SUNDAY";
+
+interface UserProfile {
+    id: number;
+    metric: boolean;
+    height: number;
+    weight: number;
+    age: number;
+    experienceLevel: ExperienceLevel;
+    weeklyTrainingDays: number;
+    maxWeekdayHours: number;
+    maxWeekendHours: number;
+    preferredRestDay: PreferredRestDay;
+}
+
 interface UserProfile {
     id: number;
     metric: boolean;
@@ -15,6 +38,22 @@ interface UserProfile {
     age: number;
     birthday?: string;
 }
+
+const EXPERIENCE_LEVELS: { value: ExperienceLevel; label: string }[] = [
+    { value: "BEGINNER", label: "Beginner" },
+    { value: "INTERMEDIATE", label: "Intermediate" },
+    { value: "ADVANCED", label: "Advanced" },
+];
+
+const REST_DAYS: { value: PreferredRestDay; label: string }[] = [
+    { value: "MONDAY", label: "Monday" },
+    { value: "TUESDAY", label: "Tuesday" },
+    { value: "WEDNESDAY", label: "Wednesday" },
+    { value: "THURSDAY", label: "Thursday" },
+    { value: "FRIDAY", label: "Friday" },
+    { value: "SATURDAY", label: "Saturday" },
+    { value: "SUNDAY", label: "Sunday" },
+];
 
 export default function AccountPage() {
     const router = useRouter();
@@ -25,6 +64,11 @@ export default function AccountPage() {
     const [inches, setInches] = useState("");
     const [weight, setWeight] = useState("");
     const [birthday, setBirthday] = useState("");
+    const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>("BEGINNER");
+    const [weeklyTrainingDays, setWeeklyTrainingDays] = useState("");
+    const [maxWeekdayHours, setMaxWeekdayHours] = useState("");
+    const [maxWeekendHours, setMaxWeekendHours] = useState("");
+    const [preferredRestDay, setPreferredRestDay] = useState<PreferredRestDay>("MONDAY");
 
     const [message, setMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -55,12 +99,13 @@ export default function AccountPage() {
                 const profile = response.data;
 
                 setMetric(profile.metric);
-                setHeight(String(profile.height));
                 setWeight(String(profile.weight));
-
-                if (profile.birthday) {
-                    setBirthday(profile.birthday);
-                }
+                setHeight(String(profile.height));
+                setExperienceLevel(profile.experienceLevel ?? "BEGINNER");
+                setWeeklyTrainingDays(profile.weeklyTrainingDays ? String(profile.weeklyTrainingDays) : "");
+                setMaxWeekdayHours(profile.maxWeekdayHours ? String(profile.maxWeekdayHours) : "");
+                setMaxWeekendHours(profile.maxWeekendHours ? String(profile.maxWeekendHours) : "");
+                setPreferredRestDay(profile.preferredRestDay ?? "MONDAY");
             }
 
             setLoading(false);
@@ -78,6 +123,9 @@ export default function AccountPage() {
             : (parseInt(feet) * 12 + parseInt(inches)) * 2.54;
 
         const weightValue = parseFloat(weight);
+        const trainingDaysValue = parseInt(weeklyTrainingDays);
+        const maxWeekdayHoursValue = parseInt(maxWeekdayHours);
+        const maxWeekendHoursValue = parseInt(maxWeekendHours);
 
         if (Number.isNaN(heightInCm) || heightInCm <= 0) {
             setErrorMessage("Enter a valid height.");
@@ -94,6 +142,21 @@ export default function AccountPage() {
             return;
         }
 
+        if (Number.isNaN(trainingDaysValue) || trainingDaysValue < 1 || trainingDaysValue > 7) {
+            setErrorMessage("Training days must be between 1 and 7.");
+            return;
+        }
+
+        if (Number.isNaN(maxWeekdayHoursValue) || maxWeekdayHoursValue < 1) {
+            setErrorMessage("Enter your max weekday training hours.");
+            return;
+        }
+
+        if (Number.isNaN(maxWeekendHoursValue) || maxWeekendHoursValue < 1) {
+            setErrorMessage("Enter your max weekend training hours.");
+            return;
+        }
+
         setSaving(true);
 
         const response = await PutRequest<{ message: string }>("/api/profile", {
@@ -101,6 +164,11 @@ export default function AccountPage() {
             height: heightInCm,
             weight: weightValue,
             birthday,
+            experienceLevel,
+            weeklyTrainingDays: trainingDaysValue,
+            maxWeekdayHours: maxWeekdayHoursValue,
+            maxWeekendHours: maxWeekendHoursValue,
+            preferredRestDay,
         });
 
         setSaving(false);
@@ -220,6 +288,79 @@ export default function AccountPage() {
                                 onChange={(e) => setBirthday(e.target.value)}
                                 required
                             />
+                        </div>
+
+                        <h2 className={styles.sectionTitle}>Training Availability</h2>
+
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Experience Level *</label>
+                            <select
+                                className={styles.inputField}
+                                value={experienceLevel}
+                                onChange={(e) => setExperienceLevel(e.target.value as ExperienceLevel)}
+                                required
+                            >
+                                {EXPERIENCE_LEVELS.map((level) => (
+                                    <option key={level.value} value={level.value}>
+                                        {level.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Weekly Training Days *</label>
+                            <input
+                                className={styles.inputField}
+                                type="number"
+                                min="1"
+                                max="7"
+                                value={weeklyTrainingDays}
+                                onChange={(e) => setWeeklyTrainingDays(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className={styles.inlineGrid}>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Max Weekday Hours *</label>
+                                <input
+                                    className={styles.inputField}
+                                    type="number"
+                                    min="1"
+                                    value={maxWeekdayHours}
+                                    onChange={(e) => setMaxWeekdayHours(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.fieldLabel}>Max Weekend Hours *</label>
+                                <input
+                                    className={styles.inputField}
+                                    type="number"
+                                    min="1"
+                                    value={maxWeekendHours}
+                                    onChange={(e) => setMaxWeekendHours(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.fieldGroup}>
+                            <label className={styles.fieldLabel}>Preferred Rest Day *</label>
+                            <select
+                                className={styles.inputField}
+                                value={preferredRestDay}
+                                onChange={(e) => setPreferredRestDay(e.target.value as PreferredRestDay)}
+                                required
+                            >
+                                {REST_DAYS.map((day) => (
+                                    <option key={day.value} value={day.value}>
+                                        {day.label}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <button className={styles.primaryButton} type="submit" disabled={saving}>
