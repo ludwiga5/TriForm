@@ -24,6 +24,11 @@ public class UserProfileService {
         profile.setHeight(data.getHeight()); // always cm from frontend
         profile.setWeight(data.getWeight());
         profile.setAge(data.getBirthday());
+        profile.setExperienceLevel(data.getExperienceLevel());
+        profile.setWeeklyTrainingDays(data.getWeeklyTrainingDays());
+        profile.setMaxWeekdayHours(data.getMaxWeekdayHours());
+        profile.setMaxWeekendHours(data.getMaxWeekendHours());
+        profile.setPreferredRestDay(data.getPreferredRestDay());
         userProfileRepository.save(profile);
     }
 
@@ -32,6 +37,11 @@ public class UserProfileService {
         profile.setWeight(data.getWeight());
         profile.setHeight(data.getHeight());
         profile.setAge(data.getBirthday());
+        profile.setExperienceLevel(data.getExperienceLevel());
+        profile.setWeeklyTrainingDays(data.getWeeklyTrainingDays());
+        profile.setMaxWeekdayHours(data.getMaxWeekdayHours());
+        profile.setMaxWeekendHours(data.getMaxWeekendHours());
+        profile.setPreferredRestDay(data.getPreferredRestDay());
         userProfileRepository.save(profile);
     }
 }

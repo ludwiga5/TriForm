@@ -1179,6 +1179,230 @@ class TriFormApiIntegrationTest {
                 .andExpect(jsonPath("$.workouts[0].completed", is(true)));
         }
 
+        @Test
+        void createProfileWorksWithExperienceAndAvailabilityFields() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBodyWithTraining(
+                        true,
+                        180.0,
+                        72.0,
+                        "2007-05-10",
+                        "BEGINNER",
+                        5,
+                        1,
+                        2,
+                        "MONDAY"
+                ))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message", notNullValue()));
+
+        mockMvc.perform(get("/api/profile")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metric", is(true)))
+                .andExpect(jsonPath("$.height", is(180.0)))
+                .andExpect(jsonPath("$.weight", is(72.0)))
+                .andExpect(jsonPath("$.experienceLevel", is("BEGINNER")))
+                .andExpect(jsonPath("$.weeklyTrainingDays", is(5)))
+                .andExpect(jsonPath("$.maxWeekdayHours", is(1)))
+                .andExpect(jsonPath("$.maxWeekendHours", is(2)))
+                .andExpect(jsonPath("$.preferredRestDay", is("MONDAY")));
+        }
+
+        @Test
+        void updateProfileWorksWithExperienceAndAvailabilityFields() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        createProfile(token, true, 180.0, 72.0, "2007-05-10");
+
+        mockMvc.perform(put("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBodyWithTraining(
+                        false,
+                        177.8,
+                        160.5,
+                        "2007-05-10",
+                        "INTERMEDIATE",
+                        6,
+                        2,
+                        3,
+                        "FRIDAY"
+                ))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", notNullValue()));
+
+        mockMvc.perform(get("/api/profile")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metric", is(false)))
+                .andExpect(jsonPath("$.height", is(177.8)))
+                .andExpect(jsonPath("$.weight", is(160.5)))
+                .andExpect(jsonPath("$.experienceLevel", is("INTERMEDIATE")))
+                .andExpect(jsonPath("$.weeklyTrainingDays", is(6)))
+                .andExpect(jsonPath("$.maxWeekdayHours", is(2)))
+                .andExpect(jsonPath("$.maxWeekendHours", is(3)))
+                .andExpect(jsonPath("$.preferredRestDay", is("FRIDAY")));
+        }
+
+        @Test
+        void profileTrainingFieldsCanBeAdvancedLevel() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBodyWithTraining(
+                        true,
+                        182.0,
+                        74.0,
+                        "2007-05-10",
+                        "ADVANCED",
+                        7,
+                        2,
+                        4,
+                        "SUNDAY"
+                ))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/profile")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.experienceLevel", is("ADVANCED")))
+                .andExpect(jsonPath("$.weeklyTrainingDays", is(7)))
+                .andExpect(jsonPath("$.maxWeekdayHours", is(2)))
+                .andExpect(jsonPath("$.maxWeekendHours", is(4)))
+                .andExpect(jsonPath("$.preferredRestDay", is("SUNDAY")));
+        }
+
+        @Test
+        void createProfileStillWorksWhenTrainingFieldsAreMissing() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBody(true, 180.0, 72.0, "2007-05-10"))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/profile")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metric", is(true)))
+                .andExpect(jsonPath("$.height", is(180.0)))
+                .andExpect(jsonPath("$.weight", is(72.0)))
+                .andExpect(jsonPath("$.experienceLevel").doesNotExist())
+                .andExpect(jsonPath("$.weeklyTrainingDays").doesNotExist())
+                .andExpect(jsonPath("$.maxWeekdayHours").doesNotExist())
+                .andExpect(jsonPath("$.maxWeekendHours").doesNotExist())
+                .andExpect(jsonPath("$.preferredRestDay").doesNotExist());
+        }
+
+        @Test
+        void invalidExperienceLevelReturnsBadRequest() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        Map<String, Object> body = profileBody(true, 180.0, 72.0, "2007-05-10");
+        body.put("experienceLevel", "EXPERT");
+        body.put("weeklyTrainingDays", 5);
+        body.put("maxWeekdayHours", 1);
+        body.put("maxWeekendHours", 2);
+        body.put("preferredRestDay", "MONDAY");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(body)))
+                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void invalidPreferredRestDayReturnsBadRequest() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        Map<String, Object> body = profileBody(true, 180.0, 72.0, "2007-05-10");
+        body.put("experienceLevel", "BEGINNER");
+        body.put("weeklyTrainingDays", 5);
+        body.put("maxWeekdayHours", 1);
+        body.put("maxWeekendHours", 2);
+        body.put("preferredRestDay", "FUNDAY");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(body)))
+                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void updateProfileCanClearOptionalTrainingFields() throws Exception {
+        register("alex", "alex@test.com", "password123");
+        String token = login("alex", "password123");
+
+        mockMvc.perform(post("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBodyWithTraining(
+                        true,
+                        180.0,
+                        72.0,
+                        "2007-05-10",
+                        "BEGINNER",
+                        5,
+                        1,
+                        2,
+                        "MONDAY"
+                ))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(put("/api/profile")
+                .header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(profileBody(true, 181.0, 73.0, "2007-05-10"))))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/profile")
+                .header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.height", is(181.0)))
+                .andExpect(jsonPath("$.weight", is(73.0)))
+                .andExpect(jsonPath("$.experienceLevel").doesNotExist())
+                .andExpect(jsonPath("$.weeklyTrainingDays").doesNotExist())
+                .andExpect(jsonPath("$.maxWeekdayHours").doesNotExist())
+                .andExpect(jsonPath("$.maxWeekendHours").doesNotExist())
+                .andExpect(jsonPath("$.preferredRestDay").doesNotExist());
+        }
+
+        private Map<String, Object> profileBodyWithTraining(
+                boolean metric,
+                double height,
+                double weight,
+                String birthday,
+                String experienceLevel,
+                int weeklyTrainingDays,
+                int maxWeekdayHours,
+                int maxWeekendHours,
+                String preferredRestDay
+        ) {
+        Map<String, Object> body = profileBody(metric, height, weight, birthday);
+        body.put("experienceLevel", experienceLevel);
+        body.put("weeklyTrainingDays", weeklyTrainingDays);
+        body.put("maxWeekdayHours", maxWeekdayHours);
+        body.put("maxWeekendHours", maxWeekendHours);
+        body.put("preferredRestDay", preferredRestDay);
+        return body;
+        }
+
     private void register(String username, String email, String password) throws Exception {
         mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
